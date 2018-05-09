@@ -34,23 +34,37 @@ int main(int argc, char *argv[]){
 		}
 	}
 	
-	try {
-		HOSP	Prob(inst);
-		cout << "\n\n\nResolvendo Inteira... \n\n";
-		Prob.iniciar_lp();
-		Prob.exportar_lp();                   //criar arquivo .lp
+	//try {
+	//	HOSP	Prob(inst);
+	//	cout << "\n\n\nResolvendo Inteira... \n\n";
+	//	Prob.iniciar_lp();
+	//	Prob.exportar_lp();                   //criar arquivo .lp
 
-		timeused(NULL);
-		Prob.revolver_ppl();                    //resolver problema
-		timeused(&time2);
+	//	timeused(NULL);
+	//	Prob.revolver_ppl();                    //resolver problema
+	//	timeused(&time2);
 
-		cout << "\n\nTempo do gecode + resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
-		//Prob.imprimir_solucao();
-		Prob.imprimir_resultados(time2);
-	}
-	catch (...) {
-		cerr << endl << "\n Erro na resolucao da inteira" << endl;
-	}
-	//getchar();
+	//	cout << "\n\nTempo do gecode + resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
+	//	//Prob.imprimir_solucao();
+	//	Prob.imprimir_resultados(time2);
+	//}
+	//catch (...) {
+	//	cerr << endl << "\n Erro na resolucao da inteira" << endl;
+	//}
+
+	//try{
+	//	HOSP	Prob(inst);
+	//	Prob.SPT();
+	//}
+	//catch (const std::exception& e)
+	//{
+	//	cerr << endl << e.what() << endl;
+	//}
+
+	HOSP	Prob(inst);
+	Prob.SPT();
+
+
+	getchar();
 	return 0;
 }
