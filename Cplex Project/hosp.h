@@ -38,6 +38,7 @@ private:
 	
 public:
 
+	struct operacao;
 
 	//construtor para ler os arquivos
 	HOSP(const char* filename);
@@ -63,6 +64,10 @@ public:
 	void imprimir_resultados(double time);
 
 	void SPT();
+
+	void LPT();
+
+	void imprimir_gantt_operacao(list<operacao> lista);
 
 
 	~HOSP();
