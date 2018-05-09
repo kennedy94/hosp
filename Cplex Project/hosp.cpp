@@ -282,6 +282,79 @@ void HOSP::imprimir_resultados(double time)
 	resultados.close();
 }
 
+
+void HOSP::SPT(){
+	struct operacao{
+		int job, stage, machine;
+		operacao(int a, int b, int c) {
+			job = a; stage = b; machine = c;
+		}
+	};
+
+
+
+	list<int> *Omega;
+	Omega = new list<int>[l];
+	list<operacao> PI;
+
+	double **M_tempo, *N_tempo;
+
+	N_tempo = new double[n];
+
+	M_tempo = new double*[l];
+
+	for (int k = 0; k < l; k++){
+		M_tempo[k] = new double[M[k]];
+	}
+	
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+	int m_min, k_min, j_min;
+	double menor;
+	while (PI.size() < n*l)	{
+		menor = FLT_MAX;
+		for (int k = 0; k < l; k++)
+			for (int m = 0; m < M[k]; m++)
+				if (M_tempo[k][m] <= menor) {
+					menor = M_tempo[k][m];
+					m_min = m;
+					k_min = k;
+				}
+
+		menor = FLT_MAX;
+		for (int j = 0; j < n; j++) {
+			for (int k = 0; k < l; k++) {
+				bool found = (find(Omega[k].begin(), Omega[k].end(), j) != Omega[k].end());
+				if (!found)
+					if (P[j][k] <= menor) {
+						menor = P[j][k];
+						j_min = j;
+					}
+			}
+		}
+
+
+		M_tempo[k_min][m_min] += max(M_tempo[k_min][m_min], N_tempo[j_min]) + P[j_min][k_min];
+		N_tempo[j_min] += max(M_tempo[k_min][m_min], N_tempo[j_min]) + P[j_min][k_min];
+
+		Omega[k_min].push_back(j_min);
+		operacao auxiliar(j_min, k_min, m_min);
+
+		PI.push_back(auxiliar);
+
+	}
+
+	for (auto elemento : PI)
+		cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+
+
+	delete[]M_tempo, N_tempo;
+}
+
  HOSP::~HOSP()
 {
 	env.end();
