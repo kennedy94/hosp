@@ -317,7 +317,7 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 		<< "\t" << time;
 	else
 		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
-		<< "\t" << cplex.getNiterations() << "\t" << time; ;
+		<< "\t" << cplex.getNiterations() << "\t" << time;
 
 	resultados.close();
 }
