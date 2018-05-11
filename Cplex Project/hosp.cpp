@@ -313,7 +313,7 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 
 
 	if (relaxacaolinear)
-		resultados << "\t" << instancia_nome << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
+		resultados << "\n" << instancia_nome << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
 		<< "\t" << time;
 	else
 		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
