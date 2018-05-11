@@ -52,7 +52,9 @@ public:
 
 	void exportar_lp();
 
-	void revolver_ppl();
+	void resolver_ppl();
+
+	void resolver_linear();
 
 	void imprimir_solucao();
 
@@ -61,7 +63,7 @@ public:
 	//pseudo-funcao de verificacao
 	void iniciar_lp();
 
-	void imprimir_resultados(double time);
+	void imprimir_resultados(double time, bool relaxacaolinear);
 
 	void SPT();
 

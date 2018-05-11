@@ -36,27 +36,45 @@ int main(int argc, char *argv[]){
 	
 	try {
 		HOSP	Prob(inst);
+		cout << "\n\n\nResolvendo Linear... \n\n";
+		Prob.iniciar_lp();
+		Prob.exportar_lp();                   //criar arquivo .lp
+
+		timeused(NULL);
+		Prob.resolver_linear();                    //resolver problema
+		timeused(&time2);
+
+		cout << "\n\nTempo (Solucao Linear): " << time2 << endl;
+		//Prob.imprimir_solucao();
+		Prob.imprimir_resultados(time2, 1);
+	}
+	catch (...) {
+		cerr << endl << "\n Erro na resolucao da Linear" << endl;
+	}
+
+
+	try {
+		HOSP	Prob(inst);
 		cout << "\n\n\nResolvendo Inteira... \n\n";
 		Prob.iniciar_lp();
 		Prob.exportar_lp();                   //criar arquivo .lp
 
 		timeused(NULL);
-		Prob.revolver_ppl();                    //resolver problema
+		Prob.resolver_ppl();                    //resolver problema
 		timeused(&time2);
 
 		cout << "\n\nTempo do gecode + resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
-		//Prob.imprimir_solucao();
-		Prob.imprimir_resultados(time2);
+		Prob.imprimir_resultados(time2, 0);
 	}
 	catch (...) {
 		cerr << endl << "\n Erro na resolucao da inteira" << endl;
 	}
 
 
-	HOSP	Prob(inst);
-	Prob.SPT();
+	//HOSP	Prob(inst);
+	//Prob.SPT();
 
-	Prob.LPT();
+	//Prob.LPT();
 
 	//getchar();
 	return 0;

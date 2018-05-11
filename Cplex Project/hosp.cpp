@@ -170,7 +170,7 @@ struct HOSP::operacao {
 	cplex.exportModel("problema_vigas.lp");
 }
 
- void HOSP::revolver_ppl() {
+ void HOSP::resolver_ppl() {
 	cplex.setParam(IloCplex::TiLim, 3600);
 
 	try
@@ -209,6 +209,32 @@ struct HOSP::operacao {
 	}
 
 }
+
+ void HOSP::resolver_linear() {
+	 IloModel relax(env);
+	 relax.add(model);
+	 for (IloInt i = 0; i < n; i++)
+		 for (IloInt j = 0; j < l; j++) {
+			 relax.add(IloConversion(env, x[i][j], ILOFLOAT));
+			 relax.add(IloConversion(env, alpha[i][j], ILOFLOAT));
+		 }
+	 
+
+	 for (IloInt i = 0; i < n; i++)
+		 for (IloInt j = 0; j < n; j++)
+			 for (IloInt k = 0; k < l; k++) {
+				 relax.add(IloConversion(env, y[i][j][k], ILOFLOAT));
+				 relax.add(IloConversion(env, beta[i][j][k], ILOFLOAT));
+			 }
+	 cplex = IloCplex(relax);
+	 //exportar_lp();
+	 if (!cplex.solve()) {
+		 env.error() << "Otimizacao do LP mal-sucedida." << endl;
+		 throw(-1);
+	 }
+
+ }
+
 
  void HOSP::imprimir_solucao() {
 	cplex.out() << "Status da solucao = " << cplex.getStatus() << endl;
@@ -281,12 +307,18 @@ struct HOSP::operacao {
 	}
 }
 
-void HOSP::imprimir_resultados(double time)
+void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 {
 	ofstream resultados("resultado.txt", fstream::app);
 
-	resultados << instancia_nome << "\t\t"<< cplex.getObjValue() << "\t\t" << cplex.getNiterations() << "\t\t"<< cplex.getNnodes() << "\t\t" << cplex.getMIPRelativeGap() << "\t\t" << time << endl;
-	
+
+	if (relaxacaolinear)
+		resultados << "\t" << instancia_nome << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
+		<< "\t" << time;
+	else
+		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
+		<< "\t" << cplex.getNiterations() << "\t" << time; ;
+
 	resultados.close();
 }
 
