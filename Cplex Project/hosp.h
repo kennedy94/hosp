@@ -25,6 +25,7 @@ private:
 	int *M, **P;
 	const char* instancia_nome;
 	class solucao;
+	double LOWER_BOUND;
 	IloEnv env;
 	IloModel model;
 	IloCplex cplex;
@@ -53,6 +54,8 @@ public:
 	void exportar_lp();
 
 	void resolver_ppl();
+
+	void CALCULAR_LOWER_BOUND();
 
 	void resolver_linear();
 

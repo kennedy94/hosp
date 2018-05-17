@@ -175,31 +175,7 @@ struct HOSP::operacao {
 
 	try
 	{
-		int *soma1 = new int[n];
-		int *soma2 = new int[l];
 
-		for (int c1 = 0; c1 < l; c1++)
-			soma2[c1] = 0;
-
-		for (int c1 = 0; c1 < n; c1++) {
-			soma1[c1] = 0;
-			for (int c2 = 0; c2 < l; c2++)
-				soma1[c1] += P[c1][c2];
-
-		}
-
-		for (int c1 = 0; c1 < l; c1++) {
-			soma2[c1] = 0;
-			for (int c2 = 0; c2 < n; c2++)
-				soma2[c1] += P[c2][c1];
-			soma2[c1] = soma2[c1] / M[c1];
-		}
-
-
-
-		cout << "\n \t \t Lower Bound" << max(maximo(soma1, n), maximo(soma2, l)) << endl << endl;
-		//getchar();
-		cplex.setParam(IloCplex::TiLim, 600);
 		cplex.solve();
 	}
 	catch (IloException& e) {
@@ -209,6 +185,33 @@ struct HOSP::operacao {
 	}
 
 }
+
+ void HOSP::CALCULAR_LOWER_BOUND() {
+	 int *soma1 = new int[n];
+	 int *soma2 = new int[l];
+
+	 for (int c1 = 0; c1 < l; c1++)
+		 soma2[c1] = 0;
+
+	 for (int c1 = 0; c1 < n; c1++) {
+		 soma1[c1] = 0;
+		 for (int c2 = 0; c2 < l; c2++)
+			 soma1[c1] += P[c1][c2];
+
+	 }
+
+	 for (int c1 = 0; c1 < l; c1++) {
+		 soma2[c1] = 0;
+		 for (int c2 = 0; c2 < n; c2++)
+			 soma2[c1] += P[c2][c1];
+		 soma2[c1] = soma2[c1] / M[c1];
+	 }
+
+	 LOWER_BOUND = max(maximo(soma1, n), maximo(soma2, l));
+
+	 delete soma1, soma2;
+ }
+
 
  void HOSP::resolver_linear() {
 	 IloModel relax(env);
@@ -311,10 +314,11 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 {
 	ofstream resultados("resultado.txt", fstream::app);
 
-
-	if (relaxacaolinear)
-		resultados << "\n" << instancia_nome << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
-		<< "\t" << time;
+	if (relaxacaolinear) {
+		CALCULAR_LOWER_BOUND();
+		resultados << "\n" << instancia_nome << "\t" << LOWER_BOUND << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
+			<< "\t" << time;
+	}
 	else
 		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
 		<< "\t" << cplex.getNiterations() << "\t" << time;
