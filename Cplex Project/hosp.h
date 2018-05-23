@@ -18,6 +18,8 @@
 using namespace std;
 #define BIG_M 1000000
 
+void timeused(double *time);
+
 class HOSP {
 private:
 	//dados da instancia
@@ -36,7 +38,7 @@ private:
 	IloArray<IloArray<IloBoolVarArray> > alpha;
 	IloArray< IloArray<IloArray<IloBoolVarArray> > > beta;
 
-	
+
 public:
 
 	struct operacao;
@@ -69,7 +71,7 @@ public:
 	void imprimir_resultados(double time, bool relaxacaolinear);
 
 	void SPT();
-
+	
 	void LPT();
 
 	void imprimir_gantt_operacao(list<operacao> lista);

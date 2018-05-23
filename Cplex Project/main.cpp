@@ -1,20 +1,5 @@
 #include "hosp.h"
-
-void timeused(double *time)
-{
-	static double tstart, tend, tprev;
-
-	if (time == NULL) {
-		clock(); /* one extra call to initialize clock */
-		tstart = tprev = clock();
-	} else {
-		tend = clock();
-		if (tend < tprev) 
-			tstart -= ULONG_MAX; /* wraparound occured */
-		tprev = tend;
-		*time = (tend-tstart) / CLOCKS_PER_SEC; /* convert to seconds */
-	}
-}
+#include "main.h"
 
 
 int main(int argc, char *argv[]){
@@ -63,19 +48,31 @@ int main(int argc, char *argv[]){
 		Prob.resolver_ppl();                    //resolver problema
 		timeused(&time2);
 
-		cout << "\n\nTempo do gecode + resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
+		cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
 		Prob.imprimir_resultados(time2, 0);
 	}
 	catch (...) {
 		cerr << endl << "\n Erro na resolucao da inteira" << endl;
 	}
+	
 
+	try{
+		HOSP	Prob(inst);
+		Prob.SPT();
+	}
+	catch (const std::exception&){
+		cerr << "erro" << endl;
+	}
 
-	//HOSP	Prob(inst);
-	//Prob.SPT();
+	try
+	{
+		HOSP	Prob(inst);
+		Prob.LPT();
+	}
+	catch (const std::exception&)
+	{
+		cerr << "erro" << endl;
+	}
 
-	//Prob.LPT();
-
-	//getchar();
 	return 0;
 }

@@ -1,5 +1,7 @@
 #include "hosp.h"
 #include "solucao.h"
+#include "float.h"
+#include <cmath>
 //construtor para ler os arquivos
 
 struct HOSP::operacao {
@@ -9,7 +11,7 @@ struct HOSP::operacao {
 	}
 };
 
- HOSP::HOSP(const char * filename) {
+HOSP::HOSP(const char * filename) {
 
 	//leitura da instancia ---------------------------------------------------
 	ifstream instancia(filename, ifstream::in);
@@ -40,7 +42,7 @@ struct HOSP::operacao {
 
 }
 
- void HOSP::iniciar_variaveis() {
+void HOSP::iniciar_variaveis() {
 	char strnum[30];
 	Cmax = IloIntVar(env, 0, 100000);
 
@@ -99,11 +101,11 @@ struct HOSP::operacao {
 
 //lembrete: c_ eh um vetor de double
 
- void HOSP::funcao_objetivo() {
+void HOSP::funcao_objetivo() {
 	model.add(IloMinimize(env, Cmax)).setName("FO");
 }
 
- void HOSP::restricoes() {
+void HOSP::restricoes() {
 	IloInt i, k, m, j;
 	IloExpr expr(env);
 	for (i = 0; i < n; i++)
@@ -166,11 +168,11 @@ struct HOSP::operacao {
 
 }
 
- void HOSP::exportar_lp() {
+void HOSP::exportar_lp() {
 	cplex.exportModel("problema_vigas.lp");
 }
 
- void HOSP::resolver_ppl() {
+void HOSP::resolver_ppl() {
 	cplex.setParam(IloCplex::TiLim, 3600);
 
 	try
@@ -186,60 +188,61 @@ struct HOSP::operacao {
 
 }
 
- void HOSP::CALCULAR_LOWER_BOUND() {
-	 int *soma1 = new int[n];
-	 int *soma2 = new int[l];
+void HOSP::CALCULAR_LOWER_BOUND() {
+	int *soma1 = new int[n];
+	int *soma2 = new int[l];
 
-	 for (int c1 = 0; c1 < l; c1++)
-		 soma2[c1] = 0;
+	for (int c1 = 0; c1 < l; c1++)
+		soma2[c1] = 0;
 
-	 for (int c1 = 0; c1 < n; c1++) {
-		 soma1[c1] = 0;
-		 for (int c2 = 0; c2 < l; c2++)
-			 soma1[c1] += P[c1][c2];
+	for (int c1 = 0; c1 < n; c1++) {
+		soma1[c1] = 0;
+		for (int c2 = 0; c2 < l; c2++)
+			soma1[c1] += P[c1][c2];
 
-	 }
+	}
 
-	 for (int c1 = 0; c1 < l; c1++) {
-		 soma2[c1] = 0;
-		 for (int c2 = 0; c2 < n; c2++)
-			 soma2[c1] += P[c2][c1];
-		 soma2[c1] = soma2[c1] / M[c1];
-	 }
+	for (int c1 = 0; c1 < l; c1++) {
+		soma2[c1] = 0;
+		for (int c2 = 0; c2 < n; c2++)
+			soma2[c1] += P[c2][c1];
+		soma2[c1] = soma2[c1] / M[c1];
+		soma2[c1] = floor(soma2[c1]);
+	}
 
-	 LOWER_BOUND = max(maximo(soma1, n), maximo(soma2, l));
+	LOWER_BOUND = max(maximo(soma1, n), maximo(soma2, l));
 
-	 delete soma1, soma2;
- }
-
-
- void HOSP::resolver_linear() {
-	 IloModel relax(env);
-	 relax.add(model);
-	 for (IloInt i = 0; i < n; i++)
-		 for (IloInt j = 0; j < l; j++) {
-			 relax.add(IloConversion(env, x[i][j], ILOFLOAT));
-			 relax.add(IloConversion(env, alpha[i][j], ILOFLOAT));
-		 }
-	 
-
-	 for (IloInt i = 0; i < n; i++)
-		 for (IloInt j = 0; j < n; j++)
-			 for (IloInt k = 0; k < l; k++) {
-				 relax.add(IloConversion(env, y[i][j][k], ILOFLOAT));
-				 relax.add(IloConversion(env, beta[i][j][k], ILOFLOAT));
-			 }
-	 cplex = IloCplex(relax);
-	 //exportar_lp();
-	 if (!cplex.solve()) {
-		 env.error() << "Otimizacao do LP mal-sucedida." << endl;
-		 throw(-1);
-	 }
-
- }
+	delete soma1, soma2;
+}
 
 
- void HOSP::imprimir_solucao() {
+void HOSP::resolver_linear() {
+	IloModel relax(env);
+	relax.add(model);
+	for (IloInt i = 0; i < n; i++)
+		for (IloInt j = 0; j < l; j++) {
+			relax.add(IloConversion(env, x[i][j], ILOFLOAT));
+			relax.add(IloConversion(env, alpha[i][j], ILOFLOAT));
+		}
+
+
+	for (IloInt i = 0; i < n; i++)
+		for (IloInt j = 0; j < n; j++)
+			for (IloInt k = 0; k < l; k++) {
+				relax.add(IloConversion(env, y[i][j][k], ILOFLOAT));
+				relax.add(IloConversion(env, beta[i][j][k], ILOFLOAT));
+			}
+	cplex = IloCplex(relax);
+	//exportar_lp();
+	if (!cplex.solve()) {
+		env.error() << "Otimizacao do LP mal-sucedida." << endl;
+		throw(-1);
+	}
+
+}
+
+
+void HOSP::imprimir_solucao() {
 	cplex.out() << "Status da solucao = " << cplex.getStatus() << endl;
 	cplex.out() << "Valor Otimo  = " << cplex.getObjValue() << endl;
 	cplex.out() << "#Iteracoes = " << cplex.getNiterations() << endl;
@@ -274,7 +277,7 @@ struct HOSP::operacao {
 
 }
 
- int HOSP::maximo(int * lista, int tamanho) {
+int HOSP::maximo(int * lista, int tamanho) {
 	int el = 0;
 	for (int it = 0; it < tamanho; it++)
 		if (el < lista[it])  el = lista[it];
@@ -285,7 +288,7 @@ struct HOSP::operacao {
 //pseudo-funcao de verificacao
 //oi
 
- void HOSP::iniciar_lp() {
+void HOSP::iniciar_lp() {
 	try {
 		model = IloModel(env);
 
@@ -327,7 +330,8 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 }
 
 
-void HOSP::SPT(){
+void HOSP::SPT() {
+	timeused(NULL);
 
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -339,22 +343,22 @@ void HOSP::SPT(){
 
 	M_tempo = new double*[l];
 
-	for (int k = 0; k < l; k++){
+	for (int k = 0; k < l; k++) {
 		M_tempo[k] = new double[M[k]];
 	}
-	
+
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
 			M_tempo[k][m] = 0;
 	for (int j = 0; j < n; j++)
 		N_tempo[j] = 0;
 
-	
+
 	double menor;
-	
+
 
 	list<int> Stage_lotados;
-	while (PI.size() < n*l)	{
+	while (PI.size() < n*l) {
 		int m_min, k_min, j_min;
 
 		menor = FLT_MAX;
@@ -364,7 +368,7 @@ void HOSP::SPT(){
 		*/
 		for (int k = 0; k < l; k++) {
 			bool found = (find(Stage_lotados.begin(), Stage_lotados.end(), k) != Stage_lotados.end());
-			if(!found)
+			if (!found)
 				for (int m = 0; m < M[k]; m++)
 					if (M_tempo[k][m] <= menor) {
 						menor = M_tempo[k][m];
@@ -405,9 +409,9 @@ void HOSP::SPT(){
 
 	}
 
-	for (auto elemento : PI)
+	/*for (auto elemento : PI)
 		cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
-
+*/
 
 	double maior = -1;
 	for (int k = 0; k < l; k++)
@@ -416,14 +420,31 @@ void HOSP::SPT(){
 				maior = M_tempo[k][m];
 
 
-	cout << endl << "Makespan -- " << maior << endl;
-	imprimir_gantt_operacao(PI);
+
+
+	double time;
+	timeused(&time);
+
+	ofstream resultados("resultado.txt", fstream::app);
+
+
+	resultados << "\tSPT\t" << maior << "\t" << time;
+
+
+	resultados.close();
+
+
+
+	//cout << endl << "Makespan -- " << maior << endl;
+	//imprimir_gantt_operacao(PI);
 	delete[]M_tempo, N_tempo;
 }
 
 
 void HOSP::LPT() {
-	
+
+	timeused(NULL);
+
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
@@ -500,8 +521,8 @@ void HOSP::LPT() {
 
 	}
 
-	for (auto elemento : PI)
-		cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+	//for (auto elemento : PI)
+	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 
 	maior = -1;
@@ -510,9 +531,21 @@ void HOSP::LPT() {
 			if (M_tempo[k][m] > maior)
 				maior = M_tempo[k][m];
 
-	cout << endl << "Makespan -- " << maior << endl;
 
-	imprimir_gantt_operacao(PI);
+	double time;
+	timeused(&time);
+
+	ofstream resultados("resultado.txt", fstream::app);
+
+
+	resultados << "\tLPT\t" << maior << "\t" << time;
+
+
+	resultados.close();
+
+	//cout << endl << "Makespan -- " << maior << endl;
+
+	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 }
@@ -534,9 +567,9 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 		N_tempo[j] = 0;
 
 
-	for (auto e: lista){
-		cout << "S" << e.stage << "M" << e.machine << "," << max(N_tempo[e.job],M_tempo[e.stage][e.machine]) << "," 
-			<< max(N_tempo[e.job], M_tempo[e.stage][e.machine]) + P[e.job][e.stage] << ",JOB" << e.job <<  endl;
+	for (auto e : lista) {
+		cout << "S" << e.stage << "M" << e.machine << "," << max(N_tempo[e.job], M_tempo[e.stage][e.machine]) << ","
+			<< max(N_tempo[e.job], M_tempo[e.stage][e.machine]) + P[e.job][e.stage] << ",JOB" << e.job << endl;
 
 		M_tempo[e.stage][e.machine] = max(N_tempo[e.job], M_tempo[e.stage][e.machine]) + P[e.job][e.stage];
 		N_tempo[e.job] = M_tempo[e.stage][e.machine];
@@ -545,7 +578,24 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 
 }
 
- HOSP::~HOSP()
+HOSP::~HOSP()
 {
 	env.end();
+}
+
+void timeused(double *time)
+{
+	static double tstart, tend, tprev;
+
+	if (time == NULL) {
+		clock(); /* one extra call to initialize clock */
+		tstart = tprev = clock();
+	}
+	else {
+		tend = clock();
+		if (tend < tprev)
+			tstart -= ULONG_MAX; /* wraparound occured */
+		tprev = tend;
+		*time = (tend - tstart) / CLOCKS_PER_SEC; /* convert to seconds */
+	}
 }
