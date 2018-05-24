@@ -33,7 +33,7 @@
 
 	}
 
-	HOSP::solucao::solucao(int n, int l, int * M, int ** P)
+	HOSP::solucao::solucao(int n, int l, int * M, double ** P)
 	{
 		this->n = n;
 		this->l = l;

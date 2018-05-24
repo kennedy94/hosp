@@ -24,14 +24,15 @@ class HOSP {
 private:
 	//dados da instancia
 	int n, l;
-	int *M, **P;
+	int *M;
+	double **P;
 	const char* instancia_nome;
 	class solucao;
 	double LOWER_BOUND;
 	IloEnv env;
 	IloModel model;
 	IloCplex cplex;
-	IloIntVar Cmax;
+	IloNumVar Cmax;
 	IloArray<IloArray<IloBoolVarArray> > x;
 	IloArray<IloNumVarArray> s;
 	IloArray<IloArray<IloArray<IloBoolVarArray> > > y;

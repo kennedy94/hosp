@@ -26,9 +26,9 @@ HOSP::HOSP(const char * filename) {
 	for (int i = 0; i < l; ++i)
 		instancia >> M[i];
 
-	P = new int*[n];
+	P = new double*[n];
 	for (int i = 0; i < n; ++i)
-		P[i] = new int[l];
+		P[i] = new double[l];
 
 	for (int i = 0; i < n; ++i)
 		for (int k = 0; k < l; ++k)

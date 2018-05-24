@@ -49,6 +49,8 @@ int main(int argc, char *argv[]){
 
 		cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
 		Prob.imprimir_resultados(time2, 0);
+		//Prob.imprimir_solucao();
+
 	}
 	catch (...) {
 		cerr << endl << "\n Erro na resolucao da inteira" << endl;
