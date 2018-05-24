@@ -134,24 +134,28 @@ void HOSP::restricoes() {
 		expr.clear();
 	}
 
-	for (i = 0; i < n; i++)
+	for (j = 0; j < n; j++)
 		for (IloInt k1 = 0; k1 < l; k1++)
 			for (IloInt k2 = 0; k2 < l; k2++)
-				if (k1 != k2) {
-					model.add(s[i][k2] >= s[i][k1] + P[i][k1] - BIG_M*(1 - alpha[i][k1][k2]));
-					model.add(s[i][k1] >= s[i][k2] + P[i][k2] - BIG_M*alpha[i][k1][k2]);
+				if (k1 != k2) 
+				{
+					model.add(s[j][k2] >= s[j][k1] + P[j][k1] - BIG_M*(1 - alpha[j][k1][k2]));
+					model.add(s[j][k1] >= s[j][k2] + P[j][k2] - BIG_M*alpha[j][k1][k2]);
 
 				}
 
 	for (i = 0; i < n; i++)
 		for (j = 0; j < n; j++)
-			for (IloInt k = 0; k < l; k++)
-				for (m = 0; m < M[k]; m++) {
-					model.add(s[j][k] >= s[i][k] + P[i][k] - BIG_M*(1 - beta[i][j][k][m]) - BIG_M*(1 - y[i][j][k][m]));
-					model.add(s[i][k] >= s[j][k] + P[j][k] - BIG_M*beta[i][j][k][m] - BIG_M*(1 - y[i][j][k][m]));
-					//model.add(beta[i][j][k][m] <= y[i][j][k][m]);
+			if(i != j)
+				for (IloInt k = 0; k < l; k++)
+					for (m = 0; m < M[k]; m++) {
+						model.add(s[j][k] >= s[i][k] + P[i][k] - BIG_M*(1 - beta[i][j][k][m]) - BIG_M*(1 - y[i][j][k][m]));
+						model.add(s[i][k] >= s[j][k] + P[j][k] - BIG_M*beta[i][j][k][m] - BIG_M*(1 - y[i][j][k][m]));
+						//model.add(beta[i][j][k][m] <= y[i][j][k][m]);
 
-				}
+					}
+
+	//model.add(beta[0][2][1][0] == 1);
 	for (i = 0; i < n; i++)
 		for (j = 0; j < n; j++)
 			if (i != j)
@@ -169,13 +173,14 @@ void HOSP::restricoes() {
 
 }
 
+
 void HOSP::exportar_lp() {
 	cplex.exportModel("problema_vigas.lp");
 }
 
 void HOSP::resolver_ppl() {
 	cplex.setParam(IloCplex::TiLim, 3600);
-
+	cplex.setParam(IloCplex::Param::Emphasis::Numerical, 1);
 	try
 	{
 
@@ -275,7 +280,7 @@ void HOSP::imprimir_solucao() {
 			cout << "S" << k << "M" << m << "," << 0 << "," << 0 << ",GAP" << endl;*/
 		}
 
-
+	cout <<"\n beta "<< cplex.getValue(beta[0][2][1][0]) << " y" << cplex.getValue(y[0][2][1][0]);
 }
 
 int HOSP::maximo(double * lista, int tamanho) {
