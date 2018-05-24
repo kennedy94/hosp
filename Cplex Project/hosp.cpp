@@ -24,7 +24,8 @@ HOSP::HOSP(const char * filename) {
 
 	M = new int[l];
 	for (int i = 0; i < l; ++i)
-		instancia >> M[i];
+		instancia >> M[i]; 
+		//M[i] = 1;
 
 	P = new double*[n];
 	for (int i = 0; i < n; ++i)
@@ -189,8 +190,8 @@ void HOSP::resolver_ppl() {
 }
 
 void HOSP::CALCULAR_LOWER_BOUND() {
-	int *soma1 = new int[n];
-	int *soma2 = new int[l];
+	double *soma1 = new double[n];
+	double *soma2 = new double[l];
 
 	for (int c1 = 0; c1 < l; c1++)
 		soma2[c1] = 0;
@@ -207,7 +208,7 @@ void HOSP::CALCULAR_LOWER_BOUND() {
 		for (int c2 = 0; c2 < n; c2++)
 			soma2[c1] += P[c2][c1];
 		soma2[c1] = soma2[c1] / M[c1];
-		soma2[c1] = floor(soma2[c1]);
+
 	}
 
 	LOWER_BOUND = max(maximo(soma1, n), maximo(soma2, l));
@@ -277,7 +278,7 @@ void HOSP::imprimir_solucao() {
 
 }
 
-int HOSP::maximo(int * lista, int tamanho) {
+int HOSP::maximo(double * lista, int tamanho) {
 	int el = 0;
 	for (int it = 0; it < tamanho; it++)
 		if (el < lista[it])  el = lista[it];

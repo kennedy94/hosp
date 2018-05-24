@@ -64,7 +64,7 @@ public:
 
 	void imprimir_solucao();
 
-	int maximo(int * lista, int tamanho);
+	int maximo(double * lista, int tamanho);
 
 	//pseudo-funcao de verificacao
 	void iniciar_lp();
