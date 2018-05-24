@@ -110,14 +110,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;IL_STD;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files\Gecode\include;C:\Program Files\IBM\ILOG\CPLEX_Studio1271\cplex\include;C:\Program Files\IBM\ILOG\CPLEX_Studio1271\concert\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Gecode\include;C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\include;C:\Program Files\IBM\ILOG\CPLEX_Studio128\concert\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\Gecode\lib;C:\Program Files\IBM\ILOG\CPLEX_Studio1271\cplex\lib\x64_windows_vs2015\stat_mdd;C:\Program Files\IBM\ILOG\CPLEX_Studio1271\concert\lib\x64_windows_vs2015\stat_mdd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>cplex1271.lib;ilocplex.lib;concert.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\Gecode\lib;C:\Program Files\IBM\ILOG\CPLEX_Studio128\cplex\lib\x64_windows_vs2015\stat_mdd;C:\Program Files\IBM\ILOG\CPLEX_Studio128\concert\lib\x64_windows_vs2015\stat_mdd;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cplex1280.lib;ilocplex.lib;concert.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
