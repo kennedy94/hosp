@@ -27,6 +27,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="solucao.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="instanciazhang" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8FF29836-5562-4688-9DF0-CA26E034C151}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
