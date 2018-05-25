@@ -280,7 +280,7 @@ void HOSP::imprimir_solucao() {
 			cout << "S" << k << "M" << m << "," << 0 << "," << 0 << ",GAP" << endl;*/
 		}
 
-	cout <<"\n beta "<< cplex.getValue(beta[0][2][1][0]) << " y" << cplex.getValue(y[0][2][1][0]);
+	//cout <<"\n beta "<< cplex.getValue(beta[0][2][1][0]) << " y" << cplex.getValue(y[0][2][1][0]);
 }
 
 int HOSP::maximo(double * lista, int tamanho) {
