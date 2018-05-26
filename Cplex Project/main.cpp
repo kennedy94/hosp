@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
 		Prob.exportar_lp();
 		cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
 		Prob.imprimir_resultados(time2, 0);
-		Prob.imprimir_solucao();
+		//Prob.imprimir_solucao();
 
 	}
 	catch (...) {
