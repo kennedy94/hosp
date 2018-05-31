@@ -291,8 +291,6 @@ int HOSP::maximo(double * lista, int tamanho) {
 	return el;
 }
 
-//pseudo-funcao de verificacao
-//oi
 
 void HOSP::iniciar_lp() {
 	try {
@@ -525,6 +523,391 @@ double HOSP::LPT() {
 	//cout << endl << "Makespan -- " << maior << endl;
 
 	//imprimir_gantt_operacao(PI);
+
+	delete[]M_tempo, N_tempo;
+
+	return maior;
+}
+
+double HOSP::LTRPOS() {
+	list<int> *Omega;
+	Omega = new list<int>[l];
+	list<operacao> PI;
+
+	double **M_tempo, *N_tempo;
+
+	N_tempo = new double[n];
+
+	M_tempo = new double*[l];
+
+	for (int k = 0; k < l; k++) {
+		M_tempo[k] = new double[M[k]];
+	}
+
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+
+	double menor, maior;
+
+
+	list<int> Stage_lotados;
+	while (PI.size() < n*l) {
+		int m_min, k_min, j_min;
+
+		menor = FLT_MAX;
+
+		/*
+		Maquina livre no estagio em que ainda nao operou com todas as tarefas
+		*/
+		for (int k = 0; k < l; k++) {
+			bool found = (find(Stage_lotados.begin(), Stage_lotados.end(), k) != Stage_lotados.end());
+			if (!found)
+				for (int m = 0; m < M[k]; m++)
+					if (M_tempo[k][m] <= menor) {
+						menor = M_tempo[k][m];
+						m_min = m;
+						k_min = k;
+					}
+		}
+
+		/*
+		Job com menor processamento que ainda nao foi processado nos outros estagios
+		*/
+
+		maior = -1;
+		bool achou = false;
+		for (int j = 0; j < n; j++) {
+			//se j ainda não foi processado no estagio k
+			bool found = (find(Omega[k_min].begin(), Omega[k_min].end(), j) != Omega[k_min].end());
+			if (!found) {
+				for (int k = 0; k < l; k++) {
+					if (k != k_min) {
+						if (P[j][k] >= maior) {
+							maior = P[j][k];
+							j_min = j;
+							achou = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (achou) {
+			M_tempo[k_min][m_min] = max(M_tempo[k_min][m_min], N_tempo[j_min]) + P[j_min][k_min];
+			N_tempo[j_min] = M_tempo[k_min][m_min];
+
+			Omega[k_min].push_back(j_min);
+
+			operacao auxiliar(j_min, k_min, m_min);
+
+			PI.push_back(auxiliar);
+		}
+		else
+			Stage_lotados.push_back(k_min);
+
+	}
+
+	//for (auto elemento : PI)
+	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+
+
+	maior = -1;
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			if (M_tempo[k][m] > maior)
+				maior = M_tempo[k][m];
+
+
+	//cout << endl << "Makespan -- " << maior << endl;
+
+	//imprimir_gantt_operacao(PI);
+
+	delete[]M_tempo, N_tempo;
+
+	return maior;
+}
+
+double HOSP::MIH() {
+
+	list<int> *Omega;
+	Omega = new list<int>[l];
+	list<operacao> PI;
+
+	double **M_tempo, *N_tempo;
+
+	N_tempo = new double[n];
+
+	M_tempo = new double*[l];
+
+	for (int k = 0; k < l; k++) {
+		M_tempo[k] = new double[M[k]];
+	}
+
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+
+	double menor, maior;
+
+
+	list<int> Stage_lotados;
+	while (PI.size() < n*l) {
+		int m_min, k_min, j_min;
+
+		menor = FLT_MAX;
+
+		/*
+		Maquina livre no estagio em que ainda nao operou com todas as tarefas
+		*/
+		for (int k = 0; k < l; k++) {
+			bool found = (find(Stage_lotados.begin(), Stage_lotados.end(), k) != Stage_lotados.end());
+			if (!found)
+				for (int m = 0; m < M[k]; m++)
+					if (M_tempo[k][m] <= menor) {
+						menor = M_tempo[k][m];
+						m_min = m;
+						k_min = k;
+					}
+		}
+
+		/*
+		Calcular Iddleness
+		*/
+		double *IDDLENESS = new double[n];
+		for (int j = 0; j < n; j++) {
+			if (N_tempo[j] > M_tempo[k_min][m_min])
+				IDDLENESS[j] = N_tempo[j] - M_tempo[k_min][m_min];
+			else
+				IDDLENESS[j] = 0;
+		}
+
+		menor = FLT_MAX;
+		bool achou = false;
+		for (int j = 0; j < n; j++) {
+			//se j ainda não foi processado no estagio k
+			bool found = (find(Omega[k_min].begin(), Omega[k_min].end(), j) != Omega[k_min].end());
+			if (!found) {
+				if (IDDLENESS[j] <= menor) {
+					menor = IDDLENESS[j];
+					j_min = j;
+					achou = true;
+				}
+				
+			}
+		}
+
+		if (achou) {
+			M_tempo[k_min][m_min] = max(M_tempo[k_min][m_min], N_tempo[j_min]) + P[j_min][k_min];
+			N_tempo[j_min] = M_tempo[k_min][m_min];
+
+			Omega[k_min].push_back(j_min);
+
+			operacao auxiliar(j_min, k_min, m_min);
+
+			PI.push_back(auxiliar);
+		}
+		else
+			Stage_lotados.push_back(k_min);
+
+	}
+
+	//for (auto elemento : PI)
+	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+
+
+	maior = -1;
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			if (M_tempo[k][m] > maior)
+				maior = M_tempo[k][m];
+
+
+	//cout << endl << "Makespan -- " << maior << endl;
+
+	//imprimir_gantt_operacao(PI);
+
+	delete[]M_tempo, N_tempo;
+
+	return maior;
+}
+
+double HOSP::BICH_makespan(list<operacao> PI) {
+	double **M_tempo, *N_tempo;
+	N_tempo = new double[n];
+	M_tempo = new double*[l];
+	for (int k = 0; k < l; k++)
+		M_tempo[k] = new double[M[k]];
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+	for (auto elemento : PI) {
+		M_tempo[elemento.stage][elemento.machine] = max(M_tempo[elemento.stage][elemento.machine], N_tempo[elemento.job]) +
+			P[elemento.job][elemento.stage];
+		N_tempo[elemento.job] = M_tempo[elemento.stage][elemento.machine];
+	}
+
+	double maior = -1;
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			if (M_tempo[k][m] > maior)
+				maior = M_tempo[k][m];
+
+	delete[]M_tempo, N_tempo;
+	return maior;
+}
+
+double HOSP::BICH_LB(int j, int k, double **Pe) {
+	double *soma1 = new double[n];
+	double *soma2 = new double[l];
+
+	for (int c1 = 0; c1 < l; c1++)
+		soma2[c1] = 0;
+
+	for (int c1 = 0; c1 < n; c1++) {
+		soma1[c1] = 0;
+		for (int c2 = 0; c2 < l; c2++)
+			if(c2 != k)
+				soma1[c1] += P[c1][c2];
+	}
+
+	for (int c1 = 0; c1 < l; c1++) {
+		soma2[c1] = 0;
+		for (int c2 = 0; c2 < n; c2++)
+			if(c2 != j)
+				soma2[c1] += P[c2][c1];
+		soma2[c1] = soma2[c1] / M[c1];
+
+	}
+	double aux = max(maximo(soma1, n), maximo(soma2, l));
+	delete soma1, soma2;
+	
+	return aux;
+}
+
+double HOSP::BICH() {
+
+	list<int> *Omega;
+	Omega = new list<int>[l];
+	list<operacao> PI;
+
+	double **M_tempo, *N_tempo;
+
+	N_tempo = new double[n];
+
+	M_tempo = new double*[l];
+
+	for (int k = 0; k < l; k++) {
+		M_tempo[k] = new double[M[k]];
+	}
+
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+
+	double menor, maior;
+	double **Paux;
+
+	Paux = new double*[n];
+	for (int i = 0; i < n; i++)
+		Paux[i] = new double[l];
+
+	for (int i = 0; i < n; i++)
+		for (int k = 0; k < l; k++)
+			Paux[i][k] = P[i][k];
+
+
+	list<int> Stage_lotados;
+	while (PI.size() < n*l) {
+		int m_min, k_min, j_min;
+
+		menor = FLT_MAX;
+
+		/*
+		Maquina livre no estagio em que ainda nao operou com todas as tarefas
+		*/
+		for (int k = 0; k < l; k++) {
+			bool found = (find(Stage_lotados.begin(), Stage_lotados.end(), k) != Stage_lotados.end());
+			if (!found)
+				for (int m = 0; m < M[k]; m++)
+					if (M_tempo[k][m] <= menor) {
+						menor = M_tempo[k][m];
+						m_min = m;
+						k_min = k;
+					}
+		}
+
+		/*
+		Calcular Vetor BICH
+		*/
+		double *BICH_VET = new double[n];
+		for (int j = 0; j < n; j++) {
+			list<operacao> auxiliar;
+			for (auto elemento : PI)
+				auxiliar.push_back(elemento);
+			operacao aaa(j, k_min, m_min);
+			auxiliar.push_back(aaa);
+			BICH_VET[j] = BICH_makespan(auxiliar) + BICH_LB(j, k_min, Paux);
+
+		}
+
+		menor = FLT_MAX;
+		bool achou = false;
+		for (int j = 0; j < n; j++) {
+			//se j ainda não foi processado no estagio k
+			bool found = (find(Omega[k_min].begin(), Omega[k_min].end(), j) != Omega[k_min].end());
+			if (!found) {
+				if (BICH_VET[j] <= menor) {
+					menor = BICH_VET[j];
+					j_min = j;
+					achou = true;
+				}
+
+			}
+		}
+
+		if (achou) {
+			Paux[j_min][k_min] = 0;
+			M_tempo[k_min][m_min] = max(M_tempo[k_min][m_min], N_tempo[j_min]) + P[j_min][k_min];
+			N_tempo[j_min] = M_tempo[k_min][m_min];
+
+			Omega[k_min].push_back(j_min);
+
+			operacao auxiliar(j_min, k_min, m_min);
+
+			PI.push_back(auxiliar);
+		}
+		else
+			Stage_lotados.push_back(k_min);
+
+	}
+
+	//for (auto elemento : PI)
+	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+
+
+	maior = -1;
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			if (M_tempo[k][m] > maior)
+				maior = M_tempo[k][m];
+
+
+	//cout << endl << "Makespan -- " << maior << endl;
+
+	imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 

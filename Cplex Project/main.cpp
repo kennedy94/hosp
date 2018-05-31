@@ -93,5 +93,54 @@ int main(int argc, char *argv[]) {
 		cerr << "erro" << endl;
 	}
 
+	try
+	{
+		HOSP	Prob(inst);
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.LTRPOS();                   //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		Prob.imprimir_resultados_heuristica(time2, make);
+	}
+	catch (const std::exception&)
+	{
+		cerr << "erro" << endl;
+	}
+
+	try
+	{
+		HOSP	Prob(inst);
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.MIH();                   //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		Prob.imprimir_resultados_heuristica(time2, make);
+	}
+	catch (const std::exception&)
+	{
+		cerr << "erro" << endl;
+	}
+
+	try
+	{
+		HOSP	Prob(inst);
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.BICH();                   //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		Prob.imprimir_resultados_heuristica(time2, make);
+	}
+	catch (const std::exception&)
+	{
+		cerr << "erro" << endl;
+	}
+
+
 	return 0;
 }

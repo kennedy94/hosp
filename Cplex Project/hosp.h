@@ -72,6 +72,16 @@ public:
 
 	double LPT();
 
+	double LTRPOS();
+
+	double MIH();
+
+	double BICH_makespan(list<operacao> PI);
+
+	double BICH_LB(int j, int k, double ** P);
+
+	double BICH();
+
 	void imprimir_resultados_heuristica(double time, double makespan);
 
 	void imprimir_gantt_operacao(list<operacao> lista);
