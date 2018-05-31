@@ -24,8 +24,8 @@ HOSP::HOSP(const char * filename) {
 
 	M = new int[l];
 	for (int i = 0; i < l; ++i)
-		instancia >> M[i]; 
-		//M[i] = 1;
+		instancia >> M[i];
+	//M[i] = 1;
 
 	P = new double*[n];
 	for (int i = 0; i < n; ++i)
@@ -137,7 +137,7 @@ void HOSP::restricoes() {
 	for (j = 0; j < n; j++)
 		for (IloInt k1 = 0; k1 < l; k1++)
 			for (IloInt k2 = 0; k2 < l; k2++)
-				if (k1 != k2) 
+				if (k1 != k2)
 				{
 					model.add(s[j][k2] >= s[j][k1] + P[j][k1] - BIG_M*(1 - alpha[j][k1][k2]));
 					model.add(s[j][k1] >= s[j][k2] + P[j][k2] - BIG_M*alpha[j][k1][k2]);
@@ -146,7 +146,7 @@ void HOSP::restricoes() {
 
 	for (i = 0; i < n; i++)
 		for (j = 0; j < n; j++)
-			if(i != j)
+			if (i != j)
 				for (IloInt k = 0; k < l; k++)
 					for (m = 0; m < M[k]; m++) {
 						model.add(s[j][k] >= s[i][k] + P[i][k] - BIG_M*(1 - beta[i][j][k][m]) - BIG_M*(1 - y[i][j][k][m]));
@@ -179,7 +179,7 @@ void HOSP::exportar_lp() {
 }
 
 void HOSP::resolver_ppl() {
-	cplex.setParam(IloCplex::TiLim, 3600);
+	cplex.setParam(IloCplex::TiLim, 600);
 	cplex.setParam(IloCplex::Param::Emphasis::Numerical, 1);
 	try
 	{
@@ -336,8 +336,7 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 }
 
 
-void HOSP::SPT() {
-	timeused(NULL);
+double HOSP::SPT() {
 
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -416,8 +415,8 @@ void HOSP::SPT() {
 	}
 
 	/*for (auto elemento : PI)
-		cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
-*/
+	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+	*/
 
 	double maior = -1;
 	for (int k = 0; k < l; k++)
@@ -427,30 +426,15 @@ void HOSP::SPT() {
 
 
 
-
-	double time;
-	timeused(&time);
-
-	ofstream resultados("resultado.txt", fstream::app);
-
-
-	resultados << "\tSPT\t" << maior << "\t" << time;
-
-
-	resultados.close();
-
-
-
 	//cout << endl << "Makespan -- " << maior << endl;
 	//imprimir_gantt_operacao(PI);
 	delete[]M_tempo, N_tempo;
+
+	return maior;
 }
 
 
-void HOSP::LPT() {
-
-	timeused(NULL);
-
+double HOSP::LPT() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
@@ -536,24 +520,25 @@ void HOSP::LPT() {
 		for (int m = 0; m < M[k]; m++)
 			if (M_tempo[k][m] > maior)
 				maior = M_tempo[k][m];
-
-
-	double time;
-	timeused(&time);
-
-	ofstream resultados("resultado.txt", fstream::app);
-
-
-	resultados << "\tLPT\t" << maior << "\t" << time;
-
-
-	resultados.close();
+	
 
 	//cout << endl << "Makespan -- " << maior << endl;
 
 	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
+
+	return maior;
+}
+
+void HOSP::imprimir_resultados_heuristica(double time, double makespan){
+	ofstream resultados("resultado.txt", fstream::app);
+
+	resultados << "\t" << makespan << "\t" << time;
+
+	resultados.close();
+
+
 }
 
 void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
@@ -587,21 +572,4 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 HOSP::~HOSP()
 {
 	env.end();
-}
-
-void timeused(double *time)
-{
-	static double tstart, tend, tprev;
-
-	if (time == NULL) {
-		clock(); /* one extra call to initialize clock */
-		tstart = tprev = clock();
-	}
-	else {
-		tend = clock();
-		if (tend < tprev)
-			tstart -= ULONG_MAX; /* wraparound occured */
-		tprev = tend;
-		*time = (tend - tstart) / CLOCKS_PER_SEC; /* convert to seconds */
-	}
 }

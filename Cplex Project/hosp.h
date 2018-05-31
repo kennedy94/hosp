@@ -14,11 +14,8 @@
 #include <vector>
 
 #include <list>
-
 using namespace std;
 #define BIG_M 1000000
-
-void timeused(double *time);
 
 class HOSP {
 private:
@@ -71,9 +68,11 @@ public:
 
 	void imprimir_resultados(double time, bool relaxacaolinear);
 
-	void SPT();
-	
-	void LPT();
+	double SPT();
+
+	double LPT();
+
+	void imprimir_resultados_heuristica(double time, double makespan);
 
 	void imprimir_gantt_operacao(list<operacao> lista);
 

@@ -1,32 +1,34 @@
 #include "hosp.h"
+#include <chrono> //Marcar tempo no maldito Linux
 
-
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 
 	//imprimir quantas casas decimais?
 
 	double time2;
 	char *inst;
-	if(argc < 2)
+	if (argc < 2)
 		inst = "problema.txt";
-	else{
-		if(argc < 3)
+	else {
+		if (argc < 3)
 			inst = argv[1];
-		else{
+		else {
 			cout << "Argumentos demais" << endl;
 			exit(0);
 		}
 	}
-	
+
 	try {
 		HOSP	Prob(inst);
 		cout << "\n\n\nResolvendo Linear... \n\n";
 		Prob.iniciar_lp();
-		Prob.exportar_lp();                   //criar arquivo .lp
+		//Prob.exportar_lp();                   //criar arquivo .lp
 
-		timeused(NULL);
+		auto comeco = chrono::high_resolution_clock::now();
 		Prob.resolver_linear();                    //resolver problema
-		timeused(&time2);
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
 
 		cout << "\n\nTempo (Solucao Linear): " << time2 << endl;
 		//Prob.imprimir_solucao();
@@ -41,12 +43,14 @@ int main(int argc, char *argv[]){
 		HOSP	Prob(inst);
 		cout << "\n\n\nResolvendo Inteira... \n\n";
 		Prob.iniciar_lp();
-		Prob.exportar_lp();                   //criar arquivo .lp
-
-		timeused(NULL);
+		//Prob.exportar_lp();                   //criar arquivo .lp
+		auto comeco = chrono::high_resolution_clock::now();
 		Prob.resolver_ppl();                    //resolver problema
-		timeused(&time2);
-		Prob.exportar_lp();
+		auto fim = chrono::high_resolution_clock::now();
+
+		//Prob.exportar_lp();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
 		cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
 		Prob.imprimir_resultados(time2, 0);
 		//Prob.imprimir_solucao();
@@ -55,20 +59,34 @@ int main(int argc, char *argv[]){
 	catch (...) {
 		cerr << endl << "\n Erro na resolucao da inteira" << endl;
 	}
-	
 
-	try{
+	double make;
+	try {
 		HOSP	Prob(inst);
-		Prob.SPT();
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.SPT();                   //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		
+		Prob.imprimir_resultados_heuristica(time2, make);
+
 	}
-	catch (const std::exception&){
+	catch (const std::exception&) {
 		cerr << "erro" << endl;
 	}
 
 	try
 	{
 		HOSP	Prob(inst);
-		Prob.LPT();
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.LPT();                   //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		Prob.imprimir_resultados_heuristica(time2, make);
 	}
 	catch (const std::exception&)
 	{
