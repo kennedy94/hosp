@@ -17,6 +17,8 @@
 using namespace std;
 #define BIG_M 1000000
 
+
+
 class HOSP {
 private:
 	//dados da instancia
@@ -36,10 +38,16 @@ private:
 	IloArray<IloArray<IloBoolVarArray> > alpha;
 	IloArray< IloArray<IloArray<IloBoolVarArray> > > beta;
 
+	struct operacao {
+		int job, stage, machine;
+		operacao(int a, int b, int c) {
+			job = a; stage = b; machine = c;
+		}
+	};
 
 public:
 
-	struct operacao;
+	
 
 	//construtor para ler os arquivos
 	HOSP(const char* filename);
@@ -68,29 +76,29 @@ public:
 
 	void imprimir_resultados(double time, bool relaxacaolinear);
 
-	double SPT();
+	list<operacao> SPT();
 
-	double LPT();
+	list<operacao> LPT();
 
-	double LTRPOS();
+	list<operacao> LTRPOS();
 
-	double MIH();
+	list<operacao> MIH();
 
 	double BICH_makespan(list<operacao> PI);
 
 	double BICH_LB(int j, int k, double ** P);
 
-	double BICH();
+	list<operacao> BICH();
 
 	void imprimir_resultados_heuristica(double time, double makespan);
 
 	void imprimir_gantt_operacao(list<operacao> lista);
 
+	list<HOSP::operacao> VETOR_PARA_OPERACAO(int * vetor);
+
+	list<HOSP::operacao> ILS();
 
 	~HOSP();
 };
-
-
-
 
 

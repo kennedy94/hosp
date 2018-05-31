@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 	try {
 		HOSP	Prob(inst);
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.SPT();                   //resolver problema
+		make = Prob.BICH_makespan(Prob.SPT());				//resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 	{
 		HOSP	Prob(inst);
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.LPT();                   //resolver problema
+		make = Prob.BICH_makespan(Prob.LPT());                   //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	{
 		HOSP	Prob(inst);
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.LTRPOS();                   //resolver problema
+		make = Prob.BICH_makespan(Prob.LTRPOS());                    //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
 	{
 		HOSP	Prob(inst);
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.MIH();                   //resolver problema
+		make = Prob.BICH_makespan(Prob.MIH());                    //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();
@@ -129,7 +129,24 @@ int main(int argc, char *argv[]) {
 	{
 		HOSP	Prob(inst);
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.BICH();                   //resolver problema
+		make = Prob.BICH_makespan(Prob.BICH());                    //resolver problema
+		auto fim = chrono::high_resolution_clock::now();
+		chrono::duration<double> elapsed = fim - comeco;
+		time2 = elapsed.count();
+
+		Prob.imprimir_resultados_heuristica(time2, make);
+	}
+	catch (const std::exception&)
+	{
+		cerr << "erro" << endl;
+	}
+
+
+	try
+	{
+		HOSP	Prob(inst);
+		auto comeco = chrono::high_resolution_clock::now();
+		make = Prob.BICH_makespan(Prob.ILS());                    //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();

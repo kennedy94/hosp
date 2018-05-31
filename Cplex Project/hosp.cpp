@@ -4,12 +4,6 @@
 #include <cmath>
 //construtor para ler os arquivos
 
-struct HOSP::operacao {
-	int job, stage, machine;
-	operacao(int a, int b, int c) {
-		job = a; stage = b; machine = c;
-	}
-};
 
 HOSP::HOSP(const char * filename) {
 
@@ -333,8 +327,7 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 	resultados.close();
 }
 
-
-double HOSP::SPT() {
+list<HOSP::operacao> HOSP::SPT() {
 
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -412,27 +405,13 @@ double HOSP::SPT() {
 
 	}
 
-	/*for (auto elemento : PI)
-	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
-	*/
-
-	double maior = -1;
-	for (int k = 0; k < l; k++)
-		for (int m = 0; m < M[k]; m++)
-			if (M_tempo[k][m] > maior)
-				maior = M_tempo[k][m];
-
-
-
-	//cout << endl << "Makespan -- " << maior << endl;
 	//imprimir_gantt_operacao(PI);
 	delete[]M_tempo, N_tempo;
 
-	return maior;
+	return PI;
 }
 
-
-double HOSP::LPT() {
+list<HOSP::operacao> HOSP::LPT() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
@@ -509,27 +488,15 @@ double HOSP::LPT() {
 
 	}
 
-	//for (auto elemento : PI)
-	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
-
-
-	maior = -1;
-	for (int k = 0; k < l; k++)
-		for (int m = 0; m < M[k]; m++)
-			if (M_tempo[k][m] > maior)
-				maior = M_tempo[k][m];
-	
-
-	//cout << endl << "Makespan -- " << maior << endl;
 
 	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 
-	return maior;
+	return PI;
 }
 
-double HOSP::LTRPOS() {
+list<HOSP::operacao> HOSP::LTRPOS() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
@@ -614,24 +581,14 @@ double HOSP::LTRPOS() {
 	//for (auto elemento : PI)
 	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
-
-	maior = -1;
-	for (int k = 0; k < l; k++)
-		for (int m = 0; m < M[k]; m++)
-			if (M_tempo[k][m] > maior)
-				maior = M_tempo[k][m];
-
-
-	//cout << endl << "Makespan -- " << maior << endl;
-
 	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 
-	return maior;
+	return PI;
 }
 
-double HOSP::MIH() {
+list<HOSP::operacao> HOSP::MIH() {
 
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -722,20 +679,12 @@ double HOSP::MIH() {
 	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 
-	maior = -1;
-	for (int k = 0; k < l; k++)
-		for (int m = 0; m < M[k]; m++)
-			if (M_tempo[k][m] > maior)
-				maior = M_tempo[k][m];
-
-
-	//cout << endl << "Makespan -- " << maior << endl;
 
 	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 
-	return maior;
+	return PI;
 }
 
 double HOSP::BICH_makespan(list<operacao> PI) {
@@ -794,7 +743,7 @@ double HOSP::BICH_LB(int j, int k, double **Pe) {
 	return aux;
 }
 
-double HOSP::BICH() {
+list<HOSP::operacao> HOSP::BICH() {
 
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -898,20 +847,11 @@ double HOSP::BICH() {
 	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 
-	maior = -1;
-	for (int k = 0; k < l; k++)
-		for (int m = 0; m < M[k]; m++)
-			if (M_tempo[k][m] > maior)
-				maior = M_tempo[k][m];
-
-
-	//cout << endl << "Makespan -- " << maior << endl;
-
-	imprimir_gantt_operacao(PI);
+	//imprimir_gantt_operacao(PI);
 
 	delete[]M_tempo, N_tempo;
 
-	return maior;
+	return PI;
 }
 
 void HOSP::imprimir_resultados_heuristica(double time, double makespan){
@@ -950,6 +890,54 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 
 	}
 
+}
+
+list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
+	list<operacao> retornada;
+	double **M_tempo, *N_tempo;
+	N_tempo = new double[n];
+	M_tempo = new double*[l];
+	for (int k = 0; k < l; k++)
+		M_tempo[k] = new double[M[k]];
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+
+	for (int i = 0; i < n*l; i++) {
+		int tarefa = vetor[i] / l;
+		int estagio = vetor[i] % l;
+
+		double menor = FLT_MAX;
+		int maquina;
+		for (int mk = 0; mk < M[estagio]; mk++)
+			if (M_tempo[estagio][mk] <= menor) {
+				menor = M_tempo[estagio][mk];
+				maquina = mk;
+			}
+
+		operacao elemento(tarefa, estagio, maquina);
+		retornada.push_back(elemento);
+		M_tempo[elemento.stage][elemento.machine] = max(M_tempo[elemento.stage][elemento.machine], N_tempo[elemento.job]) +
+			P[elemento.job][elemento.stage];
+		N_tempo[elemento.job] = M_tempo[elemento.stage][elemento.machine];
+	}
+
+	return retornada;
+}
+
+list<HOSP::operacao> HOSP::ILS() {
+	int *SOLUCAO = new int[n*l];
+
+	for (int i = 0; i < n*l; i++)
+		SOLUCAO[i] = n*l - i - 1;
+
+	list<operacao> teste = VETOR_PARA_OPERACAO(SOLUCAO);
+
+	imprimir_gantt_operacao(teste);
+	return teste;
 }
 
 HOSP::~HOSP()
