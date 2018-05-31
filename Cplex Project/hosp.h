@@ -84,7 +84,7 @@ public:
 
 	list<operacao> MIH();
 
-	double BICH_makespan(list<operacao> PI);
+	double makespan(list<operacao> PI);
 
 	double BICH_LB(int j, int k, double ** P);
 
@@ -96,7 +96,23 @@ public:
 
 	list<HOSP::operacao> VETOR_PARA_OPERACAO(int * vetor);
 
+	int * OPERACAO_PARA_VETOR(list<operacao>);
+
 	list<HOSP::operacao> ILS();
+
+	int * OPT2(int * newsolution, int a, int b);
+
+	int * INSERT_neighbourhood(int * solution);
+
+	int * INSERT(int * solution, int a, int b);
+
+	int * SWAP_neighbourhood(int * solution);
+
+	int * SWAP(int * solution, int a, int b);
+
+	int * PERTUBATE(int * solution);
+
+	int * OPT2_neighborhood(int * solution);
 
 	~HOSP();
 };

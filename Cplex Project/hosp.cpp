@@ -687,7 +687,7 @@ list<HOSP::operacao> HOSP::MIH() {
 	return PI;
 }
 
-double HOSP::BICH_makespan(list<operacao> PI) {
+double HOSP::makespan(list<operacao> PI) {
 	double **M_tempo, *N_tempo;
 	N_tempo = new double[n];
 	M_tempo = new double*[l];
@@ -808,7 +808,7 @@ list<HOSP::operacao> HOSP::BICH() {
 				auxiliar.push_back(elemento);
 			operacao aaa(j, k_min, m_min);
 			auxiliar.push_back(aaa);
-			BICH_VET[j] = BICH_makespan(auxiliar) + BICH_LB(j, k_min, Paux);
+			BICH_VET[j] = makespan(auxiliar) + BICH_LB(j, k_min, Paux);
 
 		}
 
@@ -854,10 +854,10 @@ list<HOSP::operacao> HOSP::BICH() {
 	return PI;
 }
 
-void HOSP::imprimir_resultados_heuristica(double time, double makespan){
+void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 	ofstream resultados("resultado.txt", fstream::app);
 
-	resultados << "\t" << makespan << "\t" << time;
+	resultados << "\t" << _makespan << "\t" << time;
 
 	resultados.close();
 
@@ -893,6 +893,7 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 }
 
 list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
+
 	list<operacao> retornada;
 	double **M_tempo, *N_tempo;
 	N_tempo = new double[n];
@@ -928,16 +929,217 @@ list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 	return retornada;
 }
 
+int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
+	int *vetor = new int[n*l];
+	int  i = 0;
+	for (auto elemento : PI) {
+		vetor[i] = elemento.job * l + elemento.stage;
+		i++;
+	}
+
+	return vetor;
+}
+
+
 list<HOSP::operacao> HOSP::ILS() {
 	int *SOLUCAO = new int[n*l];
+	int *SOLUCAO1 = new int[n*l];
+	int *SOLUCAO2 = new int[n*l];
+	int *SOLUCAO3 = new int[n*l];
+	int *BEST = new int[n*l];
+	SOLUCAO = OPERACAO_PARA_VETOR(MIH());
 
 	for (int i = 0; i < n*l; i++)
-		SOLUCAO[i] = n*l - i - 1;
+		BEST[i] = SOLUCAO[i];
+	
 
-	list<operacao> teste = VETOR_PARA_OPERACAO(SOLUCAO);
+	double TEMPERATURA = 100;
+	int seed = 1;
+	double melhor = makespan(VETOR_PARA_OPERACAO(SOLUCAO));
+	bool melhorou = true;
+	int iteracao = 1;
+	srand(seed);
+	do
+	{
+		cout <<"ILS - ITERACAO - " << iteracao++ << endl;
+		SOLUCAO1 = OPT2_neighborhood(SOLUCAO);
 
-	imprimir_gantt_operacao(teste);
+		double makespan_neightbor1 = makespan(VETOR_PARA_OPERACAO(SOLUCAO1));
+
+		SOLUCAO2 = INSERT_neighbourhood(SOLUCAO);
+
+		double makespan_neightbor2 = makespan(VETOR_PARA_OPERACAO(SOLUCAO2));
+
+		SOLUCAO3 = INSERT_neighbourhood(SOLUCAO);
+
+		double makespan_neightbor3 = makespan(VETOR_PARA_OPERACAO(SOLUCAO3));
+
+		double makespan_neightbor;
+		if (makespan_neightbor1 < makespan_neightbor2 && makespan_neightbor1 < makespan_neightbor3) {
+			SOLUCAO = SOLUCAO1;
+			makespan_neightbor = makespan_neightbor1;
+		}
+		else {
+			if (makespan_neightbor2 < makespan_neightbor1 &&  makespan_neightbor2 < makespan_neightbor3) {
+				SOLUCAO = SOLUCAO2;
+				makespan_neightbor = makespan_neightbor2;
+			}
+			else
+			{
+				SOLUCAO = SOLUCAO3;
+				makespan_neightbor = makespan_neightbor3;
+			}
+		}
+
+
+		if (makespan_neightbor < melhor || rand() < exp( melhor - makespan_neightbor/TEMPERATURA)) {
+			for (int i = 0; i < n*l; i++)
+				BEST[i] = SOLUCAO[i];
+			melhor = makespan_neightbor;
+			
+		}
+		else
+			melhorou = false;
+		
+		SOLUCAO = PERTUBATE(BEST);
+		TEMPERATURA *= 0.50;
+	} while (melhorou);
+
+
+
+	list<operacao> teste = VETOR_PARA_OPERACAO(BEST);
+
+	//imprimir_gantt_operacao(teste);
 	return teste;
+}
+
+int * HOSP::OPT2(int *solution, int a, int b) {
+
+	int *newsolution = new int[n*l];
+
+	for (int c = 0; c <= a - 1; c++)
+		newsolution[c] = solution[c];
+	int d = 0;
+	for (int c = a; c <= b ; c++) {
+		newsolution[c] = solution[b - d];
+		d++;
+	}
+
+	for (int c = b + 1; c < n*l; c++)
+		newsolution[c] = solution[c];
+
+	return newsolution;
+}
+
+int * HOSP::INSERT_neighbourhood(int *solution) {
+	int *newsolution = new int[n*l];
+	int *BEST = new int[n*l];
+	for (int i = 0; i < n*l; i++)
+		BEST[i] = solution[i];
+
+	double makespan_best = makespan(VETOR_PARA_OPERACAO(BEST));;
+
+	for (int it1 = 0; it1 < n*l - 1; it1++)
+		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
+			newsolution = INSERT(solution, it1, it2);
+			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(newsolution));
+
+			if (makespan_neighbor < makespan_best) {
+				for (int i = 0; i < n*l; i++)
+					BEST[i] = newsolution[i];
+				makespan_best = makespan_neighbor;
+			}
+		}
+
+	return BEST;
+}
+
+int * HOSP::INSERT(int *solution, int a, int b) {
+	int *newsolution = new int[n*l];
+
+	for (int c = 0; c < n*l; c++)
+		newsolution[c] = solution[c];
+
+	newsolution[b] = solution[a];
+
+	for (int c = a; c < b; c++)
+		newsolution[c] = solution[c + 1];
+
+	return newsolution;
+}
+
+
+int * HOSP::SWAP_neighbourhood(int *solution) {
+	int *newsolution = new int[n*l];
+	int *BEST = new int[n*l];
+	for (int i = 0; i < n*l; i++)
+		BEST[i] = solution[i];
+
+	double makespan_best = makespan(VETOR_PARA_OPERACAO(BEST));;
+
+	for (int it1 = 0; it1 < n*l - 1; it1++)
+		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
+			newsolution = SWAP(solution, it1, it2);
+			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(newsolution));
+
+			if (makespan_neighbor < makespan_best) {
+				for (int i = 0; i < n*l; i++)
+					BEST[i] = newsolution[i];
+				makespan_best = makespan_neighbor;
+			}
+		}
+
+	return BEST;
+}
+
+
+int * HOSP::SWAP(int *solution, int a, int b) {
+	int *newsolution = new int[n*l];
+
+	for (int c = 0; c < n*l; c++)
+		newsolution[c] = solution[c];
+
+	newsolution[b] = solution[a];
+	newsolution[a] = solution[b];
+
+
+	return newsolution;
+}
+
+int * HOSP::PERTUBATE(int *solution) {
+	int *PERTURBADO = new int[n*l];
+
+	for (int i = 0; i < n*l; i++)
+		PERTURBADO[i] = n*l - 1 - solution[i];
+
+	return PERTURBADO;
+}
+
+int * HOSP::OPT2_neighborhood(int *solution) {
+
+	int *BEST = new int[n*l];
+	int *NEIGHBOR = new int[n*l];
+
+	for (int i = 0; i < n*l; i++)
+		BEST[i] = solution[i];
+
+	double makespan_best = FLT_MAX;
+
+	for (int it1 = 0; it1 < n*l - 1; it1++)
+		for (int it2 = it1 + 1; it2 < n*l; it2++)
+		{
+			NEIGHBOR = OPT2(solution, it1, it2);
+			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(NEIGHBOR));
+
+			if (makespan_neighbor < makespan_best) {
+				for (int i = 0; i < n*l; i++)
+					BEST[i] = NEIGHBOR[i];
+				makespan_best = makespan_neighbor;
+			}
+		}
+
+
+	return BEST;
 }
 
 HOSP::~HOSP()
