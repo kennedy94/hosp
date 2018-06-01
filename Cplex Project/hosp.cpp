@@ -932,7 +932,7 @@ list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 }
 
 int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
-	int *vetor = new int[n*l];
+	static int *vetor = new int[n*l];
 	int  i = 0;
 	for (auto elemento : PI) {
 		vetor[i] = elemento.job * l + elemento.stage;
@@ -1008,7 +1008,7 @@ list<HOSP::operacao> HOSP::ILS() {
 
 int * HOSP::OPT2(int *solution, int a, int b) {
 
-	int *newsolution = new int[n*l];
+	static int *newsolution = new int[n*l];
 
 	for (int c = 0; c <= a - 1; c++)
 		newsolution[c] = solution[c];
@@ -1026,7 +1026,7 @@ int * HOSP::OPT2(int *solution, int a, int b) {
 
 int * HOSP::INSERT_neighbourhood(int *solution) {
 	int *newsolution = new int[n*l];
-	int *BEST = new int[n*l];
+	static int *BEST = new int[n*l];
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
@@ -1048,22 +1048,34 @@ int * HOSP::INSERT_neighbourhood(int *solution) {
 }
 
 int * HOSP::INSERT(int *solution, int a, int b) {
-	int *newsolution = new int[n*l];
-
-	for (int c = 0; c < n*l; c++)
-		newsolution[c] = solution[c];
+	static int *newsolution;
+	try
+	{
+		newsolution = new int[n*l];
+	}
+	catch (const std::exception& e )
+	{
+			cerr << e.what() << '\n';
+	}
 
 	newsolution[b] = solution[a];
 
 	for (int c = a; c < b; c++)
 		newsolution[c] = solution[c + 1];
 
+	for (int c = 0; c < a; c++)
+		newsolution[c] = solution[c];
+
+	for (int c = b+1; c < n*l; c++)
+		newsolution[c] = solution[c];
+
+
 	return newsolution;
 }
 
 int * HOSP::SWAP_neighbourhood(int *solution) {
 	int *newsolution = new int[n*l];
-	int *BEST = new int[n*l];
+	static int *BEST = new int[n*l];
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
@@ -1085,7 +1097,7 @@ int * HOSP::SWAP_neighbourhood(int *solution) {
 }
 
 int * HOSP::SWAP(int *solution, int a, int b) {
-	int *newsolution = new int[n*l];
+	static int *newsolution = new int[n*l];
 
 	for (int c = 0; c < n*l; c++)
 		newsolution[c] = solution[c];
@@ -1098,7 +1110,7 @@ int * HOSP::SWAP(int *solution, int a, int b) {
 }
 
 int * HOSP::PERTUBATE(int *solution) {
-	int *PERTURBADO = new int[n*l];
+	static int *PERTURBADO = new int[n*l];
 
 	for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
@@ -1108,7 +1120,7 @@ int * HOSP::PERTUBATE(int *solution) {
 
 int * HOSP::OPT2_neighborhood(int *solution) {
 
-	int *BEST = new int[n*l];
+	static int *BEST = new int[n*l];
 	int *NEIGHBOR = new int[n*l];
 
 	for (int i = 0; i < n*l; i++)

@@ -150,12 +150,11 @@ int main(int argc, char *argv[]) {
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();
-
 		Prob.imprimir_resultados_heuristica(time2, make);
 	}
-	catch (const std::exception&)
+	catch (const exception& e)
 	{
-		cerr << "erro" << endl;
+		cerr << e.what() << '\n';
 	}
 
 
