@@ -2,6 +2,7 @@
 #include "solucao.h"
 #include "float.h"
 #include <cmath>
+#include <memory>
 //construtor para ler os arquivos
 
 
@@ -857,7 +858,7 @@ list<HOSP::operacao> HOSP::BICH() {
 void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 	ofstream resultados("resultado.txt", fstream::app);
 
-	resultados << "\t" << _makespan << "\t" << time;
+	resultados << "\t" << _makespan << "\t" << time << endl;
 
 	resultados.close();
 
@@ -926,6 +927,7 @@ list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 		N_tempo[elemento.job] = M_tempo[elemento.stage][elemento.machine];
 	}
 
+	delete[]M_tempo, N_tempo;
 	return retornada;
 }
 
@@ -940,12 +942,8 @@ int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
 	return vetor;
 }
 
-
 list<HOSP::operacao> HOSP::ILS() {
 	int *SOLUCAO = new int[n*l];
-	int *SOLUCAO1 = new int[n*l];
-	int *SOLUCAO2 = new int[n*l];
-	int *SOLUCAO3 = new int[n*l];
 	int *BEST = new int[n*l];
 	SOLUCAO = OPERACAO_PARA_VETOR(MIH());
 
@@ -958,54 +956,49 @@ list<HOSP::operacao> HOSP::ILS() {
 	double melhor = makespan(VETOR_PARA_OPERACAO(SOLUCAO));
 	bool melhorou = true;
 	int iteracao = 1;
+	int cont_deltazero = 0;
 	srand(seed);
 	do
 	{
 		cout <<"ILS - ITERACAO - " << iteracao++ << endl;
-		SOLUCAO1 = OPT2_neighborhood(SOLUCAO);
+		
+		int sorteio = iteracao % 3;
 
-		double makespan_neightbor1 = makespan(VETOR_PARA_OPERACAO(SOLUCAO1));
-
-		SOLUCAO2 = INSERT_neighbourhood(SOLUCAO);
-
-		double makespan_neightbor2 = makespan(VETOR_PARA_OPERACAO(SOLUCAO2));
-
-		SOLUCAO3 = INSERT_neighbourhood(SOLUCAO);
-
-		double makespan_neightbor3 = makespan(VETOR_PARA_OPERACAO(SOLUCAO3));
-
-		double makespan_neightbor;
-		if (makespan_neightbor1 < makespan_neightbor2 && makespan_neightbor1 < makespan_neightbor3) {
-			SOLUCAO = SOLUCAO1;
-			makespan_neightbor = makespan_neightbor1;
-		}
-		else {
-			if (makespan_neightbor2 < makespan_neightbor1 &&  makespan_neightbor2 < makespan_neightbor3) {
-				SOLUCAO = SOLUCAO2;
-				makespan_neightbor = makespan_neightbor2;
-			}
-			else
-			{
-				SOLUCAO = SOLUCAO3;
-				makespan_neightbor = makespan_neightbor3;
-			}
+		switch (sorteio)
+		{
+		case 0:
+			SOLUCAO = OPT2_neighborhood(SOLUCAO);
+		case 1:
+			SOLUCAO = SWAP_neighbourhood(SOLUCAO);
+		case 2:
+			SOLUCAO = INSERT_neighbourhood(SOLUCAO);
 		}
 
+		double makespan_neightbor = makespan(VETOR_PARA_OPERACAO(SOLUCAO));
 
-		if (makespan_neightbor < melhor || rand() < exp( melhor - makespan_neightbor/TEMPERATURA)) {
+		double DELTA =  makespan_neightbor - melhor;
+		//Quando o DELTA trava no 0 o melhor eh parar já q provavelmente ele encontrou o otimo
+		if ((DELTA < 0 ) || (rand() / double(RAND_MAX) < (exp( -double(DELTA) /double(TEMPERATURA)))  )) {
 			for (int i = 0; i < n*l; i++)
 				BEST[i] = SOLUCAO[i];
 			melhor = makespan_neightbor;
+			if (DELTA == 0)
+				cont_deltazero++; {
+				if (cont_deltazero > n*l)
+					melhorou = false;
+			}
 			
 		}
 		else
 			melhorou = false;
 		
 		SOLUCAO = PERTUBATE(BEST);
-		TEMPERATURA *= 0.50;
+		TEMPERATURA *= 0.9;
 	} while (melhorou);
 
-
+	for (int i = 0; i < n*l; i++)
+		cout << BEST[i] << " ";
+	cout << endl;
 
 	list<operacao> teste = VETOR_PARA_OPERACAO(BEST);
 
@@ -1050,7 +1043,7 @@ int * HOSP::INSERT_neighbourhood(int *solution) {
 				makespan_best = makespan_neighbor;
 			}
 		}
-
+	delete newsolution;
 	return BEST;
 }
 
@@ -1067,7 +1060,6 @@ int * HOSP::INSERT(int *solution, int a, int b) {
 
 	return newsolution;
 }
-
 
 int * HOSP::SWAP_neighbourhood(int *solution) {
 	int *newsolution = new int[n*l];
@@ -1088,10 +1080,9 @@ int * HOSP::SWAP_neighbourhood(int *solution) {
 				makespan_best = makespan_neighbor;
 			}
 		}
-
+	delete newsolution;
 	return BEST;
 }
-
 
 int * HOSP::SWAP(int *solution, int a, int b) {
 	int *newsolution = new int[n*l];
@@ -1138,7 +1129,7 @@ int * HOSP::OPT2_neighborhood(int *solution) {
 			}
 		}
 
-
+	delete NEIGHBOR;
 	return BEST;
 }
 

@@ -18,128 +18,128 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	try {
-		HOSP	Prob(inst);
-		cout << "\n\n\nResolvendo Linear... \n\n";
-		Prob.iniciar_lp();
-		//Prob.exportar_lp();                   //criar arquivo .lp
+	//try {
+	//	HOSP	Prob(inst);
+	//	cout << "\n\n\nResolvendo Linear... \n\n";
+	//	Prob.iniciar_lp();
+	//	//Prob.exportar_lp();                   //criar arquivo .lp
 
-		auto comeco = chrono::high_resolution_clock::now();
-		Prob.resolver_linear();                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	Prob.resolver_linear();                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		cout << "\n\nTempo (Solucao Linear): " << time2 << endl;
-		//Prob.imprimir_solucao();
-		Prob.imprimir_resultados(time2, 1);
-	}
-	catch (...) {
-		cerr << endl << "\n Erro na resolucao da Linear" << endl;
-	}
+	//	cout << "\n\nTempo (Solucao Linear): " << time2 << endl;
+	//	//Prob.imprimir_solucao();
+	//	Prob.imprimir_resultados(time2, 1);
+	//}
+	//catch (...) {
+	//	cerr << endl << "\n Erro na resolucao da Linear" << endl;
+	//}
 
 
-	try {
-		HOSP	Prob(inst);
-		cout << "\n\n\nResolvendo Inteira... \n\n";
-		Prob.iniciar_lp();
-		//Prob.exportar_lp();                   //criar arquivo .lp
-		auto comeco = chrono::high_resolution_clock::now();
-		Prob.resolver_ppl();                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
+	//try {
+	//	HOSP	Prob(inst);
+	//	cout << "\n\n\nResolvendo Inteira... \n\n";
+	//	Prob.iniciar_lp();
+	//	//Prob.exportar_lp();                   //criar arquivo .lp
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	Prob.resolver_ppl();                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
 
-		//Prob.exportar_lp();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
-		cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
-		Prob.imprimir_resultados(time2, 0);
-		//Prob.imprimir_solucao();
+	//	//Prob.exportar_lp();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
+	//	cout << "\n\nTempo de resolucao do CPLEX gasto (Solucao Inteira): " << time2 << endl;
+	//	Prob.imprimir_resultados(time2, 0);
+	//	//Prob.imprimir_solucao();
 
-	}
-	catch (...) {
-		cerr << endl << "\n Erro na resolucao da inteira" << endl;
-	}
+	//}
+	//catch (...) {
+	//	cerr << endl << "\n Erro na resolucao da inteira" << endl;
+	//}
 
 	double make;
-	try {
-		HOSP	Prob(inst);
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.SPT());				//resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//try {
+	//	HOSP	Prob(inst);
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.SPT());				//resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		
-		Prob.imprimir_resultados_heuristica(time2, make);
+	//	
+	//	Prob.imprimir_resultados_heuristica(time2, make);
 
-	}
-	catch (const std::exception&) {
-		cerr << "erro" << endl;
-	}
+	//}
+	//catch (const std::exception&) {
+	//	cerr << "erro" << endl;
+	//}
 
-	try
-	{
-		HOSP	Prob(inst);
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.LPT());                   //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//try
+	//{
+	//	HOSP	Prob(inst);
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.LPT());                   //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		Prob.imprimir_resultados_heuristica(time2, make);
-	}
-	catch (const std::exception&)
-	{
-		cerr << "erro" << endl;
-	}
+	//	Prob.imprimir_resultados_heuristica(time2, make);
+	//}
+	//catch (const std::exception&)
+	//{
+	//	cerr << "erro" << endl;
+	//}
 
-	try
-	{
-		HOSP	Prob(inst);
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.LTRPOS());                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//try
+	//{
+	//	HOSP	Prob(inst);
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.LTRPOS());                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		Prob.imprimir_resultados_heuristica(time2, make);
-	}
-	catch (const std::exception&)
-	{
-		cerr << "erro" << endl;
-	}
+	//	Prob.imprimir_resultados_heuristica(time2, make);
+	//}
+	//catch (const std::exception&)
+	//{
+	//	cerr << "erro" << endl;
+	//}
 
-	try
-	{
-		HOSP	Prob(inst);
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.MIH());                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//try
+	//{
+	//	HOSP	Prob(inst);
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.MIH());                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		Prob.imprimir_resultados_heuristica(time2, make);
-	}
-	catch (const std::exception&)
-	{
-		cerr << "erro" << endl;
-	}
+	//	Prob.imprimir_resultados_heuristica(time2, make);
+	//}
+	//catch (const std::exception&)
+	//{
+	//	cerr << "erro" << endl;
+	//}
 
-	try
-	{
-		HOSP	Prob(inst);
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.BICH());                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
+	//try
+	//{
+	//	HOSP	Prob(inst);
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.BICH());                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
 
-		Prob.imprimir_resultados_heuristica(time2, make);
-	}
-	catch (const std::exception&)
-	{
-		cerr << "erro" << endl;
-	}
+	//	Prob.imprimir_resultados_heuristica(time2, make);
+	//}
+	//catch (const std::exception&)
+	//{
+	//	cerr << "erro" << endl;
+	//}
 
 
 	try
