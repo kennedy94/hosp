@@ -915,15 +915,16 @@ list<HOSP::operacao> HOSP::ILS() {
 	int seed = 1;
 	double melhor = makespan_paravetor(BEST);
 
-	int iteracao = 1;
+	int iteracao = 0;
 
 	srand(seed);
 	do
 	{
-		std::cout <<"ILS - ITERACAO - " << iteracao++ << endl;
-		
+		//std::cout << "ILS - ITERACAO - " << iteracao++ << endl;
+		iteracao++;
 		int sorteio = iteracao % 3;
 
+		//SOLUCAO_AUX recebe o melhor vizinho de SOLUCAO
 		switch (sorteio)
 		{
 		case 0:
@@ -934,28 +935,19 @@ list<HOSP::operacao> HOSP::ILS() {
 			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		}
 
+
 		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
 
-		double DELTA =  makespan_neightbor - melhor;
+		double DELTA = makespan_neightbor - melhor;
 
-		if ((DELTA < 0 )) {
+		if ((DELTA < 0) || (rand() / double(RAND_MAX) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
 			for (int i = 0; i < n*l; i++)
 				BEST[i] = SOLUCAO_AUX[i];
 			melhor = makespan_neightbor;
-
-			for (int i = 0; i < n*l; i++)
-				SOLUCAO_AUX[i] = BEST[i];
 		}
-		else {
-			if ((rand() / double(RAND_MAX) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
-				for (int i = 0; i < n*l; i++)
-					SOLUCAO_AUX[i] = SOLUCAO[i];
-			}
-		}
-		
-		PERTUBATE(SOLUCAO_AUX, SOLUCAO);
-		TEMPERATURA *= 0.9;
-	} while (3*(n+l));
+		PERTUBATE(BEST, SOLUCAO);
+		TEMPERATURA *= 0.75;
+	} while (iteracao <= 3*(n+l));
 
 	/*for (int i = 0; i < n*l; i++)
 		std::cout << BEST[i] << " ";
