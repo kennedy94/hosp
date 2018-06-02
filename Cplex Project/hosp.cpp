@@ -914,9 +914,9 @@ list<HOSP::operacao> HOSP::ILS() {
 	double TEMPERATURA = 100;
 	int seed = 1;
 	double melhor = makespan_paravetor(BEST);
-	bool melhorou = true;
+
 	int iteracao = 1;
-	int cont_deltazero = 0;
+
 	srand(seed);
 	do
 	{
@@ -951,12 +951,11 @@ list<HOSP::operacao> HOSP::ILS() {
 				for (int i = 0; i < n*l; i++)
 					SOLUCAO_AUX[i] = SOLUCAO[i];
 			}
-			melhorou = false;
 		}
 		
 		PERTUBATE(SOLUCAO_AUX, SOLUCAO);
 		TEMPERATURA *= 0.9;
-	} while (iteracao <= 3*n);
+	} while (3*(n+l));
 
 	/*for (int i = 0; i < n*l; i++)
 		std::cout << BEST[i] << " ";
