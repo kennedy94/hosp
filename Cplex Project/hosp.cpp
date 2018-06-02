@@ -323,7 +323,7 @@ void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 			<< "\t" << time;
 	}
 	else
-		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
+		resultados << "\n" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
 		<< "\t" << cplex.getNiterations() << "\t" << time;
 
 	resultados.close();
@@ -830,8 +830,8 @@ double HOSP::makespan_paravetor(int * vetor) {
 void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 	ofstream resultados("resultado.txt", fstream::app);
 
-	//resultados << "\t" << _makespan << "\t" << time << "\t";
-	resultados << _makespan << "\t" << time << endl;
+	resultados << "\t" << _makespan << "\t" << time;
+	//resultados << _makespan << "\t" << time << endl;
 	resultados.close();
 
 

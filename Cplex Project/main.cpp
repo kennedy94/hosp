@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 	bool ILS_only = false;
 	double make;
 	if (!ILS_only){
+		/*
 		try {
 			HOSP	Prob(inst);
 			cout << "\n\n\nResolvendo Linear... \n\n";
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
 		}
 		catch (...) {
 			cerr << endl << "\n Erro na resolucao da Linear" << endl;
-		}
+		}*/
 
 
 		try {
@@ -62,7 +63,7 @@ int main(int argc, char *argv[]) {
 			cerr << endl << "\n Erro na resolucao da inteira" << endl;
 		}
 
-		
+		/*
 		try {
 			HOSP	Prob(inst);
 			auto comeco = chrono::high_resolution_clock::now();
@@ -142,7 +143,7 @@ int main(int argc, char *argv[]) {
 		{
 			cerr << "erro" << endl;
 		}
-		
+	*/	
 	}
 
 	
