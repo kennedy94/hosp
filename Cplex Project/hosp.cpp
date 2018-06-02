@@ -31,7 +31,10 @@ HOSP::HOSP(const char * filename) {
 			instancia >> P[i][k];
 
 	instancia.close();
-
+	N_tempo = new double[n];
+	M_tempo = new double*[l];
+	for (int k = 0; k < l; k++)
+		M_tempo[k] = new double[M[k]];
 	//solucao solu(n, l, M, P);
 	//solu.heuristica();
 
@@ -183,7 +186,6 @@ void HOSP::resolver_ppl() {
 	}
 	catch (IloException& e) {
 		cerr << "Erro: " << e.getMessage() << endl;
-		cout << "\nErro ilocplex" << endl;
 		throw(-1);
 	}
 
@@ -248,19 +250,19 @@ void HOSP::imprimir_solucao() {
 	cplex.out() << "Valor Otimo  = " << cplex.getObjValue() << endl;
 	cplex.out() << "#Iteracoes = " << cplex.getNiterations() << endl;
 	cplex.out() << "#Nos de BB  = " << cplex.getNnodes() << endl;
-	cout << "\n     Funcao Objetivo: " << cplex.getObjValue() << endl;
-	cout << "\n\n";
+	std::cout << "\n     Funcao Objetivo: " << cplex.getObjValue() << endl;
+	std::cout << "\n\n";
 
 	IloInt k, m, i;
 	for (i = 0; i < n; i++)
 		for (k = 0; k < l; k++)
-			cout << "s(" << i << "," << k << ") = " << cplex.getValue(s[i][k]) << endl;
+			std::cout << "s(" << i << "," << k << ") = " << cplex.getValue(s[i][k]) << endl;
 
 	for (i = 0; i < n; i++)
 		for (k = 0; k < l; k++)
 			for (m = 0; m < M[k]; m++)
 				if (cplex.getValue(x[i][k][m]) == 1)
-					cout << "x(" << i << "," << k << "," << m << ") = " << cplex.getValue(x[i][k][m]) << endl;
+					std::cout << "x(" << i << "," << k << "," << m << ") = " << cplex.getValue(x[i][k][m]) << endl;
 
 
 	for (k = 0; k < l; k++)
@@ -268,14 +270,14 @@ void HOSP::imprimir_solucao() {
 			bool sem = false;
 			for (i = 0; i < n; i++)
 				if (cplex.getValue(x[i][k][m]) == 1) {
-					cout << "S" << k << "M" << m << "," << cplex.getValue(s[i][k]) << "," << cplex.getValue(s[i][k]) + P[i][k] << ",JOB" << i << endl;
+					std::cout << "S" << k << "M" << m << "," << cplex.getValue(s[i][k]) << "," << cplex.getValue(s[i][k]) + P[i][k] << ",JOB" << i << endl;
 					sem = true;
 				}
 			/*if(!sem)
-			cout << "S" << k << "M" << m << "," << 0 << "," << 0 << ",GAP" << endl;*/
+			std::cout << "S" << k << "M" << m << "," << 0 << "," << 0 << ",GAP" << endl;*/
 		}
 
-	//cout <<"\n beta "<< cplex.getValue(beta[0][2][1][0]) << " y" << cplex.getValue(y[0][2][1][0]);
+	//std::cout <<"\n beta "<< cplex.getValue(beta[0][2][1][0]) << " y" << cplex.getValue(y[0][2][1][0]);
 }
 
 int HOSP::maximo(double * lista, int tamanho) {
@@ -285,7 +287,6 @@ int HOSP::maximo(double * lista, int tamanho) {
 
 	return el;
 }
-
 
 void HOSP::iniciar_lp() {
 	try {
@@ -303,12 +304,12 @@ void HOSP::iniciar_lp() {
 	}
 	catch (IloException& e) {
 		cerr << "Erro: " << e.getMessage() << endl;
-		cout << "\nErro ilocplex" << endl;
+		std::cout << "\nErro ilocplex" << endl;
 		return;
 	}
 	catch (...) {
 		cerr << "Outra excecao" << endl;
-		cout << "\noutra excecao" << endl;
+		std::cout << "\noutra excecao" << endl;
 	}
 }
 
@@ -333,16 +334,6 @@ list<HOSP::operacao> HOSP::SPT() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
-
-	double **M_tempo, *N_tempo;
-
-	N_tempo = new double[n];
-
-	M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -407,8 +398,6 @@ list<HOSP::operacao> HOSP::SPT() {
 	}
 
 	//imprimir_gantt_operacao(PI);
-	delete[]M_tempo, N_tempo;
-
 	return PI;
 }
 
@@ -416,16 +405,6 @@ list<HOSP::operacao> HOSP::LPT() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
-
-	double **M_tempo, *N_tempo;
-
-	N_tempo = new double[n];
-
-	M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -492,8 +471,6 @@ list<HOSP::operacao> HOSP::LPT() {
 
 	//imprimir_gantt_operacao(PI);
 
-	delete[]M_tempo, N_tempo;
-
 	return PI;
 }
 
@@ -501,16 +478,6 @@ list<HOSP::operacao> HOSP::LTRPOS() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
-
-	double **M_tempo, *N_tempo;
-
-	N_tempo = new double[n];
-
-	M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -580,11 +547,9 @@ list<HOSP::operacao> HOSP::LTRPOS() {
 	}
 
 	//for (auto elemento : PI)
-	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+	//	std::cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 	//imprimir_gantt_operacao(PI);
-
-	delete[]M_tempo, N_tempo;
 
 	return PI;
 }
@@ -594,16 +559,6 @@ list<HOSP::operacao> HOSP::MIH() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
-
-	double **M_tempo, *N_tempo;
-
-	N_tempo = new double[n];
-
-	M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -677,23 +632,17 @@ list<HOSP::operacao> HOSP::MIH() {
 	}
 
 	//for (auto elemento : PI)
-	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+	//	std::cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 
 
 	//imprimir_gantt_operacao(PI);
 
-	delete[]M_tempo, N_tempo;
-
 	return PI;
 }
 
 double HOSP::makespan(list<operacao> PI) {
-	double **M_tempo, *N_tempo;
-	N_tempo = new double[n];
-	M_tempo = new double*[l];
-	for (int k = 0; k < l; k++)
-		M_tempo[k] = new double[M[k]];
+	
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
 			M_tempo[k][m] = 0;
@@ -712,7 +661,6 @@ double HOSP::makespan(list<operacao> PI) {
 			if (M_tempo[k][m] > maior)
 				maior = M_tempo[k][m];
 
-	delete[]M_tempo, N_tempo;
 	return maior;
 }
 
@@ -749,16 +697,6 @@ list<HOSP::operacao> HOSP::BICH() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
 	list<operacao> PI;
-
-	double **M_tempo, *N_tempo;
-
-	N_tempo = new double[n];
-
-	M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -845,20 +783,54 @@ list<HOSP::operacao> HOSP::BICH() {
 	}
 
 	//for (auto elemento : PI)
-	//	cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
+	//	std::cout << "Operacao pi " << elemento.job << "," << elemento.stage << "," << elemento.machine << endl;
 
 
 	//imprimir_gantt_operacao(PI);
 
-	delete[]M_tempo, N_tempo;
+	delete[]Paux;
 
 	return PI;
+}
+
+double HOSP::makespan_paravetor(int * vetor) {
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			M_tempo[k][m] = 0;
+	for (int j = 0; j < n; j++)
+		N_tempo[j] = 0;
+
+	for (int i = 0; i < n*l; i++) {
+		int tarefa = vetor[i] / l;
+		int estagio = vetor[i] % l;
+
+		double menor = FLT_MAX;
+		int maquina;
+		for (int mk = 0; mk < M[estagio]; mk++)
+			if (M_tempo[estagio][mk] <= menor) {
+				menor = M_tempo[estagio][mk];
+				maquina = mk;
+			}
+
+		M_tempo[estagio][maquina] = max(M_tempo[estagio][maquina], N_tempo[tarefa]) +
+			P[tarefa][estagio];
+		N_tempo[tarefa] = M_tempo[estagio][maquina];
+	}
+
+	double maior = -1;
+	for (int k = 0; k < l; k++)
+		for (int m = 0; m < M[k]; m++)
+			if (M_tempo[k][m] > maior)
+				maior = M_tempo[k][m];
+
+	//std::cout << maior << endl;
+	return maior;
 }
 
 void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 	ofstream resultados("resultado.txt", fstream::app);
 
-	resultados << "\t" << _makespan << "\t" << time << endl;
+	resultados << "\t" << _makespan << "\t" << time << "\t";
 
 	resultados.close();
 
@@ -866,14 +838,6 @@ void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 }
 
 void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
-
-	double *N_tempo = new double[n];
-
-	double **M_tempo = new double*[l];
-
-	for (int k = 0; k < l; k++) {
-		M_tempo[k] = new double[M[k]];
-	}
 
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
@@ -883,7 +847,7 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 
 
 	for (auto e : lista) {
-		cout << "S" << e.stage << "M" << e.machine << "," << max(N_tempo[e.job], M_tempo[e.stage][e.machine]) << ","
+		std::cout << "S" << e.stage << "M" << e.machine << "," << max(N_tempo[e.job], M_tempo[e.stage][e.machine]) << ","
 			<< max(N_tempo[e.job], M_tempo[e.stage][e.machine]) + P[e.job][e.stage] << ",JOB" << e.job << endl;
 
 		M_tempo[e.stage][e.machine] = max(N_tempo[e.job], M_tempo[e.stage][e.machine]) + P[e.job][e.stage];
@@ -896,11 +860,7 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 
 	list<operacao> retornada;
-	double **M_tempo, *N_tempo;
-	N_tempo = new double[n];
-	M_tempo = new double*[l];
-	for (int k = 0; k < l; k++)
-		M_tempo[k] = new double[M[k]];
+	
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
 			M_tempo[k][m] = 0;
@@ -927,7 +887,6 @@ list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 		N_tempo[elemento.job] = M_tempo[elemento.stage][elemento.machine];
 	}
 
-	delete[]M_tempo, N_tempo;
 	return retornada;
 }
 
@@ -944,72 +903,72 @@ int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
 
 list<HOSP::operacao> HOSP::ILS() {
 	int *SOLUCAO = new int[n*l];
+	int *SOLUCAO_AUX = new int[n*l];
 	int *BEST = new int[n*l];
 	SOLUCAO = OPERACAO_PARA_VETOR(MIH());
-
+	SOLUCAO_AUX = SOLUCAO;
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = SOLUCAO[i];
 	
 
 	double TEMPERATURA = 100;
 	int seed = 1;
-	double melhor = makespan(VETOR_PARA_OPERACAO(SOLUCAO));
+	double melhor = makespan_paravetor(BEST);
 	bool melhorou = true;
 	int iteracao = 1;
 	int cont_deltazero = 0;
 	srand(seed);
 	do
 	{
-		cout <<"ILS - ITERACAO - " << iteracao++ << endl;
+		std::cout <<"ILS - ITERACAO - " << iteracao++ << endl;
 		
 		int sorteio = iteracao % 3;
 
 		switch (sorteio)
 		{
 		case 0:
-			SOLUCAO = OPT2_neighborhood(SOLUCAO);
+			OPT2_neighborhood(SOLUCAO, SOLUCAO_AUX);
 		case 1:
-			SOLUCAO = SWAP_neighbourhood(SOLUCAO);
+			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		case 2:
-			SOLUCAO = INSERT_neighbourhood(SOLUCAO);
+			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		}
 
-		double makespan_neightbor = makespan(VETOR_PARA_OPERACAO(SOLUCAO));
+		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
 
 		double DELTA =  makespan_neightbor - melhor;
-		//Quando o DELTA trava no 0 o melhor eh parar já q provavelmente ele encontrou o otimo
-		if ((DELTA < 0 ) || (rand() / double(RAND_MAX) < (exp( -double(DELTA) /double(TEMPERATURA)))  )) {
-			for (int i = 0; i < n*l; i++)
-				BEST[i] = SOLUCAO[i];
-			melhor = makespan_neightbor;
-			if (DELTA == 0)
-				cont_deltazero++; {
-				if (cont_deltazero > n*l)
-					melhorou = false;
-			}
-			
-		}
-		else
-			melhorou = false;
-		
-		SOLUCAO = PERTUBATE(BEST);
-		TEMPERATURA *= 0.9;
-	} while (melhorou);
 
-	for (int i = 0; i < n*l; i++)
-		cout << BEST[i] << " ";
-	cout << endl;
+		if ((DELTA < 0 )) {
+			for (int i = 0; i < n*l; i++)
+				BEST[i] = SOLUCAO_AUX[i];
+			melhor = makespan_neightbor;
+
+			for (int i = 0; i < n*l; i++)
+				SOLUCAO_AUX[i] = BEST[i];
+		}
+		else {
+			if ((rand() / double(RAND_MAX) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
+				for (int i = 0; i < n*l; i++)
+					SOLUCAO_AUX[i] = SOLUCAO[i];
+			}
+			melhorou = false;
+		}
+		
+		PERTUBATE(SOLUCAO_AUX, SOLUCAO);
+		TEMPERATURA *= 0.9;
+	} while (iteracao <= 3*n);
+
+	/*for (int i = 0; i < n*l; i++)
+		std::cout << BEST[i] << " ";
+	std::cout << endl;*/
 
 	list<operacao> teste = VETOR_PARA_OPERACAO(BEST);
-
+	delete SOLUCAO, SOLUCAO_AUX, BEST;
 	//imprimir_gantt_operacao(teste);
 	return teste;
 }
 
-int * HOSP::OPT2(int *solution, int a, int b) {
-
-	static int *newsolution = new int[n*l];
-
+void HOSP::OPT2(int *solution, int a, int b, int * &newsolution) {
 	for (int c = 0; c <= a - 1; c++)
 		newsolution[c] = solution[c];
 	int d = 0;
@@ -1020,22 +979,19 @@ int * HOSP::OPT2(int *solution, int a, int b) {
 
 	for (int c = b + 1; c < n*l; c++)
 		newsolution[c] = solution[c];
-
-	return newsolution;
 }
 
-int * HOSP::INSERT_neighbourhood(int *solution) {
+void HOSP::INSERT_neighbourhood(int *solution, int * &BEST) {
 	int *newsolution = new int[n*l];
-	static int *BEST = new int[n*l];
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
-	double makespan_best = makespan(VETOR_PARA_OPERACAO(BEST));;
-
+	double makespan_best = makespan_paravetor(BEST);
+	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
-			newsolution = INSERT(solution, it1, it2);
-			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(newsolution));
+			INSERT(solution, it1, it2, newsolution);
+			makespan_neighbor = makespan_paravetor(newsolution);
 
 			if (makespan_neighbor < makespan_best) {
 				for (int i = 0; i < n*l; i++)
@@ -1044,20 +1000,9 @@ int * HOSP::INSERT_neighbourhood(int *solution) {
 			}
 		}
 	delete newsolution;
-	return BEST;
 }
 
-int * HOSP::INSERT(int *solution, int a, int b) {
-	static int *newsolution;
-	try
-	{
-		newsolution = new int[n*l];
-	}
-	catch (const std::exception& e )
-	{
-			cerr << e.what() << '\n';
-	}
-
+void HOSP::INSERT(int *solution, int a, int b, int *&newsolution) {
 	newsolution[b] = solution[a];
 
 	for (int c = a; c < b; c++)
@@ -1068,23 +1013,19 @@ int * HOSP::INSERT(int *solution, int a, int b) {
 
 	for (int c = b+1; c < n*l; c++)
 		newsolution[c] = solution[c];
-
-
-	return newsolution;
 }
 
-int * HOSP::SWAP_neighbourhood(int *solution) {
+void HOSP::SWAP_neighbourhood(int *solution, int * &BEST) {
 	int *newsolution = new int[n*l];
-	static int *BEST = new int[n*l];
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
-	double makespan_best = makespan(VETOR_PARA_OPERACAO(BEST));;
-
+	double makespan_best = makespan_paravetor(BEST);
+	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
-			newsolution = SWAP(solution, it1, it2);
-			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(newsolution));
+			SWAP(solution, it1, it2, newsolution);
+			makespan_neighbor = makespan_paravetor(newsolution);
 
 			if (makespan_neighbor < makespan_best) {
 				for (int i = 0; i < n*l; i++)
@@ -1093,46 +1034,35 @@ int * HOSP::SWAP_neighbourhood(int *solution) {
 			}
 		}
 	delete newsolution;
-	return BEST;
 }
 
-int * HOSP::SWAP(int *solution, int a, int b) {
-	static int *newsolution = new int[n*l];
-
+void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
 	for (int c = 0; c < n*l; c++)
 		newsolution[c] = solution[c];
 
 	newsolution[b] = solution[a];
 	newsolution[a] = solution[b];
-
-
-	return newsolution;
 }
 
-int * HOSP::PERTUBATE(int *solution) {
-	static int *PERTURBADO = new int[n*l];
-
+void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
 	for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
-
-	return PERTURBADO;
 }
 
-int * HOSP::OPT2_neighborhood(int *solution) {
-
-	static int *BEST = new int[n*l];
+void HOSP::OPT2_neighborhood(int *solution, int * &BEST) {
 	int *NEIGHBOR = new int[n*l];
 
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
 	double makespan_best = FLT_MAX;
-
+	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l; it2++)
 		{
-			NEIGHBOR = OPT2(solution, it1, it2);
-			double makespan_neighbor = makespan(VETOR_PARA_OPERACAO(NEIGHBOR));
+			OPT2(solution, it1, it2, NEIGHBOR);
+
+			makespan_neighbor = makespan_paravetor(BEST);
 
 			if (makespan_neighbor < makespan_best) {
 				for (int i = 0; i < n*l; i++)
@@ -1142,7 +1072,6 @@ int * HOSP::OPT2_neighborhood(int *solution) {
 		}
 
 	delete NEIGHBOR;
-	return BEST;
 }
 
 HOSP::~HOSP()

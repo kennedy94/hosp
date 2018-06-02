@@ -38,6 +38,8 @@ private:
 	IloArray<IloArray<IloBoolVarArray> > alpha;
 	IloArray< IloArray<IloArray<IloBoolVarArray> > > beta;
 
+	double **M_tempo, *N_tempo;
+
 	struct operacao {
 		int job, stage, machine;
 		operacao(int a, int b, int c) {
@@ -90,6 +92,8 @@ public:
 
 	list<operacao> BICH();
 
+	double makespan_paravetor(int * vetor);
+
 	void imprimir_resultados_heuristica(double time, double makespan);
 
 	void imprimir_gantt_operacao(list<operacao> lista);
@@ -100,19 +104,19 @@ public:
 
 	list<HOSP::operacao> ILS();
 
-	int * OPT2(int * newsolution, int a, int b);
+	void OPT2(int * solution, int a, int b, int *& newsolution);
 
-	int * INSERT_neighbourhood(int * solution);
+	void INSERT_neighbourhood(int * solution, int *& BEST);
 
-	int * INSERT(int * solution, int a, int b);
+	void INSERT(int * solution, int a, int b, int *& newsolution);
 
-	int * SWAP_neighbourhood(int * solution);
+	void SWAP_neighbourhood(int * solution, int *& BEST);
 
-	int * SWAP(int * solution, int a, int b);
+	void SWAP(int * solution, int a, int b, int *& newsolution);
 
-	int * PERTUBATE(int * solution);
+	void PERTUBATE(int * solution, int *& PERTURBADO);
 
-	int * OPT2_neighborhood(int * solution);
+	void OPT2_neighborhood(int * solution, int *& BEST);
 
 	~HOSP();
 };
