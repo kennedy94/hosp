@@ -177,7 +177,7 @@ void HOSP::exportar_lp() {
 }
 
 void HOSP::resolver_ppl() {
-	cplex.setParam(IloCplex::TiLim, 600);
+	cplex.setParam(IloCplex::TiLim, 3600);
 	cplex.setParam(IloCplex::Param::Emphasis::Numerical, 1);
 	try
 	{
@@ -830,8 +830,8 @@ double HOSP::makespan_paravetor(int * vetor) {
 void HOSP::imprimir_resultados_heuristica(double time, double _makespan){
 	ofstream resultados("resultado.txt", fstream::app);
 
-	resultados << "\t" << _makespan << "\t" << time << "\t";
-
+	//resultados << "\t" << _makespan << "\t" << time << "\t";
+	resultados << _makespan << "\t" << time << endl;
 	resultados.close();
 
 
@@ -934,7 +934,6 @@ list<HOSP::operacao> HOSP::ILS() {
 		case 2:
 			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		}
-
 
 		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
 

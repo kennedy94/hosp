@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 			exit(0);
 		}
 	}
-	bool ILS_only = true;
+	bool ILS_only = false;
 	double make;
 	if (!ILS_only){
 		try {
@@ -142,9 +142,10 @@ int main(int argc, char *argv[]) {
 		{
 			cerr << "erro" << endl;
 		}
-
+		
 	}
 
+	
 	try
 	{
 		HOSP	Prob(inst);
@@ -159,6 +160,7 @@ int main(int argc, char *argv[]) {
 	{
 		cerr << e.what() << '\n';
 	}
+	
 
 
 	return 0;
