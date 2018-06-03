@@ -17,6 +17,11 @@ int main(int argc, char *argv[]) {
 			exit(0);
 		}
 	}
+
+	ofstream resultados("resultado.txt", fstream::app);
+	resultados << endl << inst;
+	resultados.close();
+
 	bool ILS_only = false;
 	double make;
 	if (!ILS_only){

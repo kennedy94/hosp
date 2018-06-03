@@ -181,7 +181,6 @@ void HOSP::resolver_ppl() {
 	cplex.setParam(IloCplex::Param::Emphasis::Numerical, 1);
 	try
 	{
-
 		cplex.solve();
 	}
 	catch (IloException& e) {
@@ -316,14 +315,13 @@ void HOSP::iniciar_lp() {
 void HOSP::imprimir_resultados(double time, bool relaxacaolinear)
 {
 	ofstream resultados("resultado.txt", fstream::app);
-
 	if (relaxacaolinear) {
 		CALCULAR_LOWER_BOUND();
-		resultados << "\n" << instancia_nome << "\t" << LOWER_BOUND << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
+		resultados << "\t" << LOWER_BOUND << "\t" << cplex.getObjValue() << "\t" << cplex.getNiterations()
 			<< "\t" << time;
 	}
 	else
-		resultados << "\n" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
+		resultados << "\t" << cplex.getObjValue() << "\t" << cplex.getMIPRelativeGap() << "\t" << cplex.getNnodes()
 		<< "\t" << cplex.getNiterations() << "\t" << time;
 
 	resultados.close();
@@ -1045,7 +1043,7 @@ void HOSP::OPT2_neighborhood(int *solution, int * &BEST) {
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = solution[i];
 
-	double makespan_best = FLT_MAX;
+	double makespan_best = makespan_paravetor(BEST);
 	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l; it2++)
