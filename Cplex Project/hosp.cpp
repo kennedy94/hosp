@@ -53,8 +53,6 @@ void HOSP::iniciar_variaveis() {
 	beta = IloArray<IloArray<IloArray<IloBoolVarArray> > >(env, n);
 	//nome bonitinho para variavel
 	for (IloInt i = 0; i < n; i++) {
-
-
 		x[i] = IloArray<IloBoolVarArray>(env, l);
 		s[i] = IloNumVarArray(env, l, 0, 100000);
 		for (IloInt k = 0; k < l; k++) {
@@ -610,7 +608,7 @@ list<HOSP::operacao> HOSP::MIH() {
 					j_min = j;
 					achou = true;
 				}
-				
+
 			}
 		}
 
@@ -640,7 +638,7 @@ list<HOSP::operacao> HOSP::MIH() {
 }
 
 double HOSP::makespan(list<operacao> PI) {
-	
+
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
 			M_tempo[k][m] = 0;
@@ -686,7 +684,7 @@ double HOSP::BICH_LB(int j, int k, double **Pe) {
 	}
 	double aux = max(maximo(soma1, n), maximo(soma2, l));
 	delete soma1, soma2;
-	
+
 	return aux;
 }
 
@@ -858,7 +856,7 @@ void HOSP::imprimir_gantt_operacao(list<operacao> lista) {
 list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 
 	list<operacao> retornada;
-	
+
 	for (int k = 0; k < l; k++)
 		for (int m = 0; m < M[k]; m++)
 			M_tempo[k][m] = 0;
@@ -907,30 +905,32 @@ list<HOSP::operacao> HOSP::ILS() {
 	SOLUCAO_AUX = SOLUCAO;
 	for (int i = 0; i < n*l; i++)
 		BEST[i] = SOLUCAO[i];
-	
 
-	double TEMPERATURA = 100;
+
+	double TEMPERATURA = 1000;
 	int seed = 1;
 	double melhor = makespan_paravetor(BEST);
 
 	int iteracao = 0;
 
-	srand(seed);
+	srand(time(NULL));
 	do
 	{
 		//std::cout << "ILS - ITERACAO - " << iteracao++ << endl;
 		iteracao++;
-		int sorteio = iteracao % 3;
+		int sorteio = iteracao % 2;
 
 		//SOLUCAO_AUX recebe o melhor vizinho de SOLUCAO
 		switch (sorteio)
 		{
 		case 0:
-			OPT2_neighborhood(SOLUCAO, SOLUCAO_AUX);
+            INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+			//OPT2_neighborhood(SOLUCAO, SOLUCAO_AUX);
 		case 1:
 			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
-		case 2:
+		/*case 2:
 			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+			*/
 		}
 
 		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
@@ -944,7 +944,7 @@ list<HOSP::operacao> HOSP::ILS() {
 		}
 		PERTUBATE(BEST, SOLUCAO);
 		TEMPERATURA *= 0.75;
-	} while (iteracao <= 3*(n+l));
+	} while (iteracao <= (1000*(n+l)));
 
 	/*for (int i = 0; i < n*l; i++)
 		std::cout << BEST[i] << " ";
@@ -1024,7 +1024,7 @@ void HOSP::SWAP_neighbourhood(int *solution, int * &BEST) {
 	delete newsolution;
 }
 
-void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
+inline void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
 	for (int c = 0; c < n*l; c++)
 		newsolution[c] = solution[c];
 
@@ -1032,9 +1032,25 @@ void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
 	newsolution[a] = solution[b];
 }
 
-void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
-	for (int i = 0; i < n*l; i++)
+inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
+    srand(time(NULL));
+    int p1 = 0;
+    int p2 = 0;
+
+    while(p1 >= p2){
+        p1 = rand() % n*l;
+        p2 = rand() % n*l;
+    }
+    OPT2(solution, p1, p2, PERTURBADO);
+
+	/*for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
+*/
+    /*for (int i = 0; i < n*l; i++){
+		PERTURBADO[i] = (solution[i]+1)%(n*l);
+        cout << PERTURBADO[i] << " ";
+    }
+    cout << endl;*/
 }
 
 void HOSP::OPT2_neighborhood(int *solution, int * &BEST) {
