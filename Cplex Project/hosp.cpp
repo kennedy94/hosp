@@ -942,8 +942,13 @@ list<HOSP::operacao> HOSP::ILS() {
 				BEST[i] = SOLUCAO_AUX[i];
 			melhor = makespan_neightbor;
 		}
-		PERTUBATE(BEST, SOLUCAO);
-		TEMPERATURA *= 0.75;
+
+		if(iteracao%100 == 0)
+            RESTART(BEST, SOLUCAO);
+        else
+            PERTUBATE(BEST, SOLUCAO);
+
+		TEMPERATURA *= 0.9;
 	} while (iteracao <= (1000*(n+l)));
 
 	/*for (int i = 0; i < n*l; i++)
@@ -955,6 +960,7 @@ list<HOSP::operacao> HOSP::ILS() {
 	//imprimir_gantt_operacao(teste);
 	return teste;
 }
+
 
 void HOSP::OPT2(int *solution, int a, int b, int * &newsolution) {
 	for (int c = 0; c <= a - 1; c++)
@@ -1031,6 +1037,17 @@ inline void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
 	newsolution[b] = solution[a];
 	newsolution[a] = solution[b];
 }
+
+inline void HOSP::RESTART(int *solution, int * &PERTURBADO) {
+	for (int i = 0; i < n*l; i++)
+		PERTURBADO[i] = n*l - 1 - solution[i];
+    /*for (int i = 0; i < n*l; i++){
+		PERTURBADO[i] = (solution[i]+1)%(n*l);
+        cout << PERTURBADO[i] << " ";
+    }
+    cout << endl;*/
+}
+
 
 inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
     srand(time(NULL));
