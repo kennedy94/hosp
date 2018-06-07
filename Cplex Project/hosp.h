@@ -114,6 +114,8 @@ public:
 
 	void SWAP(int * solution, int a, int b, int *& newsolution);
 
+	inline void RESTART(int * solution, int *& PERTURBADO);
+
 	void PERTUBATE(int * solution, int *& PERTURBADO);
 
 	void OPT2_neighborhood(int * solution, int *& BEST);

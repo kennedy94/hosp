@@ -887,7 +887,7 @@ list<HOSP::operacao> HOSP::VETOR_PARA_OPERACAO(int *vetor) {
 }
 
 int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
-	static int *vetor = new int[n*l];
+	int *vetor = new int[n*l];
 	int  i = 0;
 	for (auto elemento : PI) {
 		vetor[i] = elemento.job * l + elemento.stage;

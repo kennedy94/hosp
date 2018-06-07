@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 	resultados << endl << inst;
 	resultados.close();
 
-	bool ILS_only = false;
+	bool ILS_only = true;
 	double make;
 	if (!ILS_only){
 		/*
@@ -150,11 +150,11 @@ int main(int argc, char *argv[]) {
 		}
 	*/	
 	}
-
-	
-	try
+	int i = 0;
+	HOSP	Prob(inst);
+	while (i < 10)
 	{
-		HOSP	Prob(inst);
+		i++;
 		auto comeco = chrono::high_resolution_clock::now();
 		make = Prob.makespan(Prob.ILS());                    //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
@@ -162,10 +162,7 @@ int main(int argc, char *argv[]) {
 		time2 = elapsed.count();
 		Prob.imprimir_resultados_heuristica(time2, make);
 	}
-	catch (const exception& e)
-	{
-		cerr << e.what() << '\n';
-	}
+	
 	
 
 
