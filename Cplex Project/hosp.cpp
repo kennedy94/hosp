@@ -1,8 +1,6 @@
 #include "hosp.h"
-#include "solucao.h"
-#include "float.h"
-#include <cmath>
-#include <memory>
+
+
 //construtor para ler os arquivos
 
 
@@ -898,24 +896,41 @@ int * HOSP::OPERACAO_PARA_VETOR(list<operacao> PI) {
 }
 
 list<HOSP::operacao> HOSP::ILS() {
+	//Para o limite de tempo
+	auto TEMPO_COMECO = chrono::high_resolution_clock::now();
+	chrono::duration<double> elapsed;
+
 	int *SOLUCAO = new int[n*l];
 	int *SOLUCAO_AUX = new int[n*l];
+	int *SOLUCAO_AUX2 = new int[n*l];
 	int *BEST = new int[n*l];
 	SOLUCAO = OPERACAO_PARA_VETOR(MIH());
-	SOLUCAO_AUX = SOLUCAO;
-	for (int i = 0; i < n*l; i++)
+	//SOLUCAO_AUX = SOLUCAO;
+	//SOLUCAO_AUX2 = SOLUCAO;
+	for (int i = 0; i < n*l; i++) {
 		BEST[i] = SOLUCAO[i];
+		SOLUCAO_AUX2[i] = SOLUCAO[i];
+		SOLUCAO_AUX[i] = SOLUCAO[i];
+	}
 
 
 	double TEMPERATURA = 1000;
-	int seed = 1;
 	double melhor = makespan_paravetor(BEST);
 
 	int iteracao = 0;
+	
+	//RANDOM- Tendi nada so sei que funciona
+	mt19937_64 rng;
+	// initialize the random number generator with time-dependent seed
+	uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+	rng.seed(ss);
+	// initialize a uniform distribution between 0 and 1
+	uniform_real_distribution<double> unif(0, 1);
 
-	srand(time(NULL));
 	do
 	{
+
 		//std::cout << "ILS - ITERACAO - " << iteracao++ << endl;
 		iteracao++;
 		int sorteio = iteracao % 2;
@@ -925,31 +940,44 @@ list<HOSP::operacao> HOSP::ILS() {
 		{
 		case 0:
             INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
-			//OPT2_neighborhood(SOLUCAO, SOLUCAO_AUX);
 		case 1:
 			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
-		/*case 2:
-			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
-			*/
 		}
 
 		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
 
 		double DELTA = makespan_neightbor - melhor;
 
-		if ((DELTA < 0) || (rand() / double(RAND_MAX) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
+		if ((DELTA < 0) || (unif(rng) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
 			for (int i = 0; i < n*l; i++)
-				BEST[i] = SOLUCAO_AUX[i];
-			melhor = makespan_neightbor;
+				SOLUCAO_AUX2[i] = SOLUCAO_AUX[i];
+
+			if (DELTA < 0) {
+				for (int i = 0; i < n*l; i++)
+					BEST[i] = SOLUCAO_AUX[i];
+				melhor = makespan_neightbor;
+			}
+		}
+		else {
+			for (int i = 0; i < n*l; i++)
+				SOLUCAO_AUX2[i] = SOLUCAO[i];
 		}
 
-		if(iteracao%100 == 0)
-            RESTART(BEST, SOLUCAO);
+		if (iteracao%100 == 0)
+			RESTART(SOLUCAO_AUX2, SOLUCAO);
         else
-            PERTUBATE(BEST, SOLUCAO);
+            PERTUBATE(SOLUCAO_AUX2, SOLUCAO);
 
-		TEMPERATURA *= 0.9;
-	} while (iteracao <= (1000*(n+l)));
+		TEMPERATURA *= 0.99;
+
+
+		auto  TEMPO_FIM = chrono::high_resolution_clock::now();
+		elapsed = TEMPO_FIM - TEMPO_COMECO;
+		if (elapsed.count() > 3600.00)
+			break;
+
+
+	} while (	iteracao <= 1000*(n+l)	);
 
 	/*for (int i = 0; i < n*l; i++)
 		std::cout << BEST[i] << " ";
@@ -978,9 +1006,9 @@ void HOSP::OPT2(int *solution, int a, int b, int * &newsolution) {
 void HOSP::INSERT_neighbourhood(int *solution, int * &BEST) {
 	int *newsolution = new int[n*l];
 	for (int i = 0; i < n*l; i++)
-		BEST[i] = solution[i];
+		newsolution[i] = solution[i];
+	double makespan_best = makespan_paravetor(solution);
 
-	double makespan_best = makespan_paravetor(BEST);
 	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
@@ -1012,9 +1040,9 @@ void HOSP::INSERT(int *solution, int a, int b, int *&newsolution) {
 void HOSP::SWAP_neighbourhood(int *solution, int * &BEST) {
 	int *newsolution = new int[n*l];
 	for (int i = 0; i < n*l; i++)
-		BEST[i] = solution[i];
+		newsolution[i] = solution[i];
+	double makespan_best = makespan_paravetor(solution);
 
-	double makespan_best = makespan_paravetor(BEST);
 	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l - 1; it2++) {
@@ -1050,13 +1078,20 @@ inline void HOSP::RESTART(int *solution, int * &PERTURBADO) {
 
 
 inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
-    srand(time(NULL));
+	std::mt19937_64 rng;
+	// initialize the random number generator with time-dependent seed
+	uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	std::seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+	rng.seed(ss);
+	// initialize a uniform distribution between 0 and 1
+	std::uniform_int_distribution<int> unif(0, n*l - 1);
     int p1 = 0;
     int p2 = 0;
 
-    while(p1 >= p2){
-        p1 = rand() % n*l;
-        p2 = rand() % n*l;
+
+    while(p1 + 2>= p2){
+        p1 = unif(rng);
+        p2 = unif(rng);
     }
     OPT2(solution, p1, p2, PERTURBADO);
 
@@ -1072,11 +1107,10 @@ inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
 
 void HOSP::OPT2_neighborhood(int *solution, int * &BEST) {
 	int *NEIGHBOR = new int[n*l];
-
 	for (int i = 0; i < n*l; i++)
-		BEST[i] = solution[i];
+		NEIGHBOR[i] = solution[i];
+	double makespan_best = makespan_paravetor(solution);
 
-	double makespan_best = makespan_paravetor(BEST);
 	double makespan_neighbor;
 	for (int it1 = 0; it1 < n*l - 1; it1++)
 		for (int it2 = it1 + 1; it2 < n*l; it2++)

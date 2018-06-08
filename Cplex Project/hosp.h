@@ -14,6 +14,13 @@
 #include <vector>
 
 #include <list>
+
+#include "float.h"
+#include <cmath>
+#include <memory>
+#include <cstdlib>
+#include <random>
+#include <chrono>
 using namespace std;
 #define BIG_M 1000000
 
@@ -104,6 +111,7 @@ public:
 
 	list<HOSP::operacao> ILS();
 
+
 	void OPT2(int * solution, int a, int b, int *& newsolution);
 
 	void INSERT_neighbourhood(int * solution, int *& BEST);
@@ -115,6 +123,7 @@ public:
 	void SWAP(int * solution, int a, int b, int *& newsolution);
 
 	inline void RESTART(int * solution, int *& PERTURBADO);
+
 
 	void PERTUBATE(int * solution, int *& PERTURBADO);
 

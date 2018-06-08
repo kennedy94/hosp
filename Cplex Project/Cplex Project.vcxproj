@@ -20,12 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hosp.h" />
-    <ClInclude Include="solucao.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="hosp.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="solucao.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="instanciazhang" />

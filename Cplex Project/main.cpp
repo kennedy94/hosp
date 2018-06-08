@@ -1,5 +1,4 @@
 #include "hosp.h"
-#include <chrono> //Marcar tempo no maldito Linux
 
 int main(int argc, char *argv[]) {
 
