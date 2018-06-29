@@ -89,6 +89,8 @@ public:
 
 	list<operacao> LPT();
 
+	list<operacao> ILS_antigo();
+
 	list<operacao> LTRPOS();
 
 	list<operacao> MIH();

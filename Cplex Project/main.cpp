@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 	{
 		i++;
 		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.ILS());                    //resolver problema
+		make = Prob.makespan(Prob.ILS_antigo());                    //resolver problema
 		auto fim = chrono::high_resolution_clock::now();
 		chrono::duration<double> elapsed = fim - comeco;
 		time2 = elapsed.count();

@@ -468,6 +468,7 @@ list<HOSP::operacao> HOSP::LPT() {
 	return PI;
 }
 
+
 list<HOSP::operacao> HOSP::LTRPOS() {
 	list<int> *Omega;
 	Omega = new list<int>[l];
@@ -988,6 +989,103 @@ list<HOSP::operacao> HOSP::ILS() {
 	//imprimir_gantt_operacao(teste);
 	return teste;
 }
+list<HOSP::operacao> HOSP::ILS_antigo()
+{
+	//Para o limite de tempo
+	auto TEMPO_COMECO = chrono::high_resolution_clock::now();
+	chrono::duration<double> elapsed;
+
+	int *SOLUCAO = new int[n*l];
+	int *SOLUCAO_AUX = new int[n*l];
+	int *SOLUCAO_AUX2 = new int[n*l];
+	int *BEST = new int[n*l];
+	SOLUCAO = OPERACAO_PARA_VETOR(MIH());
+	//SOLUCAO_AUX = SOLUCAO;
+	//SOLUCAO_AUX2 = SOLUCAO;
+	for (int i = 0; i < n*l; i++) {
+		BEST[i] = SOLUCAO[i];
+		SOLUCAO_AUX2[i] = SOLUCAO[i];
+		SOLUCAO_AUX[i] = SOLUCAO[i];
+	}
+
+
+	double TEMPERATURA = 1000;
+	double melhor = makespan_paravetor(BEST);
+
+	int iteracao = 0;
+
+	//RANDOM- Tendi nada so sei que funciona
+	mt19937_64 rng;
+	// initialize the random number generator with time-dependent seed
+	uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+	rng.seed(ss);
+	// initialize a uniform distribution between 0 and 1
+	uniform_real_distribution<double> unif(0, 1);
+	int sem_melhora = 0;
+	do
+	{
+
+		//std::cout << "ILS - ITERACAO - " << iteracao++ << endl;
+		iteracao++;
+		int sorteio = iteracao % 2;
+
+		//SOLUCAO_AUX recebe o melhor vizinho de SOLUCAO
+		switch (sorteio)
+		{
+		case 0:
+			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+		case 1:
+			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+		}
+
+		double makespan_neightbor = makespan_paravetor(SOLUCAO_AUX);
+
+		double DELTA = makespan_neightbor - melhor;
+
+		if ((DELTA < 0) || (unif(rng) < (exp(-double(DELTA) / double(TEMPERATURA))))) {
+			for (int i = 0; i < n*l; i++)
+				SOLUCAO_AUX2[i] = SOLUCAO_AUX[i];
+
+			if (DELTA < 0) {
+				for (int i = 0; i < n*l; i++)
+					BEST[i] = SOLUCAO_AUX[i];
+				melhor = makespan_neightbor;
+				sem_melhora = 0;
+			}
+			else { sem_melhora++; }
+		}
+		else {
+			for (int i = 0; i < n*l; i++)
+				SOLUCAO_AUX2[i] = SOLUCAO[i];
+		}
+
+		if (iteracao % 10 == 0)
+			RESTART(SOLUCAO_AUX2, SOLUCAO);
+		else {
+			PERTUBATE(SOLUCAO_AUX2, SOLUCAO);
+
+		}
+		TEMPERATURA *= 0.99;
+
+
+		auto  TEMPO_FIM = chrono::high_resolution_clock::now();
+		elapsed = TEMPO_FIM - TEMPO_COMECO;
+		if (elapsed.count() > 3600.00 || sem_melhora > 100)
+			break;
+
+
+	} while (iteracao <= 1000 * (n + l));
+
+	/*for (int i = 0; i < n*l; i++)
+	std::cout << BEST[i] << " ";
+	std::cout << endl;*/
+
+	list<operacao> teste = VETOR_PARA_OPERACAO(BEST);
+	delete SOLUCAO, SOLUCAO_AUX, BEST;
+	//imprimir_gantt_operacao(teste);
+	return teste;
+}
 
 
 void HOSP::OPT2(int *solution, int a, int b, int * &newsolution) {
@@ -1078,6 +1176,7 @@ inline void HOSP::RESTART(int *solution, int * &PERTURBADO) {
 
 
 inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
+
 	std::mt19937_64 rng;
 	// initialize the random number generator with time-dependent seed
 	uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -1089,7 +1188,7 @@ inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
     int p2 = 0;
 
 
-    while(p1 + 2>= p2){
+    while(p1 + 3>= p2){
         p1 = unif(rng);
         p2 = unif(rng);
     }
@@ -1103,6 +1202,7 @@ inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
         cout << PERTURBADO[i] << " ";
     }
     cout << endl;*/
+
 }
 
 void HOSP::OPT2_neighborhood(int *solution, int * &BEST) {
