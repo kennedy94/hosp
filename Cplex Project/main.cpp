@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 	}
 	int i = 0;
 	HOSP	Prob(inst);
-	while (i < 10)
+	while (i < 1)
 	{
 		i++;
 		auto comeco = chrono::high_resolution_clock::now();

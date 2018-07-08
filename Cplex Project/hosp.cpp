@@ -1034,7 +1034,7 @@ list<HOSP::operacao> HOSP::ILS_antigo()
 		switch (sorteio)
 		{
 		case 0:
-			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+			OPT2_neighborhood(SOLUCAO, SOLUCAO_AUX);
 		case 1:
 			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		}
@@ -1060,22 +1060,21 @@ list<HOSP::operacao> HOSP::ILS_antigo()
 				SOLUCAO_AUX2[i] = SOLUCAO[i];
 		}
 
-		if (iteracao % 10 == 0)
-			RESTART(SOLUCAO_AUX2, SOLUCAO);
+		if (iteracao % 100 == 0)
+			RESTART(BEST, SOLUCAO);
 		else {
 			PERTUBATE(SOLUCAO_AUX2, SOLUCAO);
-
 		}
 		TEMPERATURA *= 0.99;
 
 
 		auto  TEMPO_FIM = chrono::high_resolution_clock::now();
 		elapsed = TEMPO_FIM - TEMPO_COMECO;
-		if (elapsed.count() > 3600.00 || sem_melhora > 100)
+		if (elapsed.count() > 3600.00 || sem_melhora > 1000)
 			break;
 
 
-	} while (iteracao <= 1000 * (n + l));
+	} while (iteracao <= 100 * (n + l));
 
 	/*for (int i = 0; i < n*l; i++)
 	std::cout << BEST[i] << " ";
@@ -1188,11 +1187,11 @@ inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
     int p2 = 0;
 
 
-    while(p1 + 3>= p2){
+    while(p1 == p2){
         p1 = unif(rng);
         p2 = unif(rng);
     }
-    OPT2(solution, p1, p2, PERTURBADO);
+    INSERT(solution, p1, p2, PERTURBADO);
 
 	/*for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
