@@ -1073,8 +1073,7 @@ list<HOSP::operacao> HOSP::ILS_antigo()
 		if (elapsed.count() > 3600.00 || sem_melhora > 1000)
 			break;
 
-
-	} while (iteracao <= 100 * (n + l));
+	} while (iteracao <= 1000 * (n + l));
 
 	/*for (int i = 0; i < n*l; i++)
 	std::cout << BEST[i] << " ";
