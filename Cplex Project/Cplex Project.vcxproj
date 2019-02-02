@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Goldansaz.h" />
     <ClInclude Include="hosp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Goldansaz.cpp" />
     <ClCompile Include="hosp.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

@@ -2,3 +2,44 @@
 hosp_10_10-2_1
 hosp_10_10-2_1
 hosp_10_10-2_1
+hosp_10_10-2_1
+hosp_10_10-2_1
+hosp_10_10-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1
+hosp_3_3-2_1	1000	187	0.248246
+hosp_10_10-2_1
+hosp_10_10-2_1
+hosp_10_10-2_1
+hosp_5_5-5_10	1007	0	187159	1142373	77.0301
+hosp_5_5-5_10
+instancias//hosp_5_5-5_1
+instancias//hosp_5_5-5_1
+instances//hosp_5_5-5_1
+instances//hosp_5_5-5_1
+instances//hosp_5_5-5_1
+instances//hosp_4_4-5_1	1000	0	2868	50095	1.67525
+instances//hosp_4_4-5_1	1000	27673	0.844258
+instances//hosp_5_5-5_5	1000	29107	3.30639
+instances//hosp_5_5-5_5	1000	0	4030	79565	4.94413
+instances//hosp_10_10-5_1	1026	0.47076	35308	1294772	600.201
+instances//hosp_10_10-5_1	1044	1670480	600.143
