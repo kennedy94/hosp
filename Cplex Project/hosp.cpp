@@ -103,6 +103,10 @@ void HOSP::funcao_objetivo() {
 void HOSP::restricoes() {
 	IloInt i, k, m, j;
 	IloExpr expr(env);
+
+	CALCULAR_LOWER_BOUND();
+	model.add(LOWER_BOUND <= Cmax);
+
 	for (i = 0; i < n; i++)
 		for (k = 0; k < l; k++) {
 			for (m = 0; m < M[k]; m++)
@@ -112,7 +116,7 @@ void HOSP::restricoes() {
 			expr.clear();
 		}
 
-	for (i = 0; i < n; i++) {
+	/*for (i = 0; i < n; i++) {
 		for (k = 0; k < l; k++)
 			for (m = 0; m < M[k]; m++)
 				expr += x[i][k][m];
@@ -126,7 +130,7 @@ void HOSP::restricoes() {
 				expr += x[i][k][m];
 		model.add(expr == n);
 		expr.clear();
-	}
+	}*/
 
 	for (j = 0; j < n; j++)
 		for (IloInt k1 = 0; k1 < l; k1++)
@@ -941,7 +945,7 @@ list<HOSP::operacao> HOSP::ILS() {
 		switch (sorteio)
 		{
 		case 0:
-            INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
+			INSERT_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		case 1:
 			SWAP_neighbourhood(SOLUCAO, SOLUCAO_AUX);
 		}
@@ -967,8 +971,8 @@ list<HOSP::operacao> HOSP::ILS() {
 
 		if (iteracao%100 == 0)
 			RESTART(SOLUCAO_AUX2, SOLUCAO);
-        else
-            PERTUBATE(SOLUCAO_AUX2, SOLUCAO);
+		else
+			PERTUBATE(SOLUCAO_AUX2, SOLUCAO);
 
 		TEMPERATURA *= 0.99;
 
@@ -1166,11 +1170,11 @@ inline void HOSP::SWAP(int *solution, int a, int b, int *&newsolution) {
 inline void HOSP::RESTART(int *solution, int * &PERTURBADO) {
 	for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
-    /*for (int i = 0; i < n*l; i++){
+	/*for (int i = 0; i < n*l; i++){
 		PERTURBADO[i] = (solution[i]+1)%(n*l);
-        cout << PERTURBADO[i] << " ";
-    }
-    cout << endl;*/
+		cout << PERTURBADO[i] << " ";
+	}
+	cout << endl;*/
 }
 
 
@@ -1183,24 +1187,24 @@ inline void HOSP::PERTUBATE(int *solution, int * &PERTURBADO) {
 	rng.seed(ss);
 	// initialize a uniform distribution between 0 and 1
 	std::uniform_int_distribution<int> unif(0, n*l - 1);
-    int p1 = 0;
-    int p2 = 0;
+	int p1 = 0;
+	int p2 = 0;
 
 
-    while(p1 == p2){
-        p1 = unif(rng);
-        p2 = unif(rng);
-    }
-    INSERT(solution, p1, p2, PERTURBADO);
+	while(p1 == p2){
+		p1 = unif(rng);
+		p2 = unif(rng);
+	}
+	INSERT(solution, p1, p2, PERTURBADO);
 
 	/*for (int i = 0; i < n*l; i++)
 		PERTURBADO[i] = n*l - 1 - solution[i];
 */
-    /*for (int i = 0; i < n*l; i++){
+	/*for (int i = 0; i < n*l; i++){
 		PERTURBADO[i] = (solution[i]+1)%(n*l);
-        cout << PERTURBADO[i] << " ";
-    }
-    cout << endl;*/
+		cout << PERTURBADO[i] << " ";
+	}
+	cout << endl;*/
 
 }
 

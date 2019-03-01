@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 */
 
 
-	bool ILS_only = true;
+	bool ILS_only = false;
 	double make;
 	if (!ILS_only){
 		/*
@@ -174,23 +174,24 @@ int main(int argc, char *argv[]) {
 		}
 	*/	
 	}
-	int i = 0;
-	HOSP	Prob(inst);
+
+	//int i = 0;
+	//HOSP	Prob(inst);
 
 
-	while (i < 10)
-	{
-		i++;
-		auto comeco = chrono::high_resolution_clock::now();
-		make = Prob.makespan(Prob.ILS());                    //resolver problema
-		auto fim = chrono::high_resolution_clock::now();
-		chrono::duration<double> elapsed = fim - comeco;
-		time2 = elapsed.count();
-		Prob.imprimir_resultados_heuristica(time2, make);
-	}
+	//while (i < 10)
+	//{
+	//	i++;
+	//	auto comeco = chrono::high_resolution_clock::now();
+	//	make = Prob.makespan(Prob.ILS());                    //resolver problema
+	//	auto fim = chrono::high_resolution_clock::now();
+	//	chrono::duration<double> elapsed = fim - comeco;
+	//	time2 = elapsed.count();
+	//	Prob.imprimir_resultados_heuristica(time2, make);
+	//}
+	//
 	
-	
-
+	getchar();
 	return 0;
 }
 
